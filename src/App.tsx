@@ -387,7 +387,7 @@ export default function App() {
                     </div>
                     <div>
                       <p className="text-[10px] font-bold uppercase tracking-widest text-gold mb-1">Certificação Premium</p>
-                      <p className="text-lg font-serif font-bold text-midnight">Garantia Vitalícia de Cuidado</p>
+                      <p className="text-lg font-serif font-bold text-midnight">Garantia de Cuidado Exclusivo</p>
                     </div>
                   </div>
                 </div>

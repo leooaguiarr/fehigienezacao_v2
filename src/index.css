@@ -1,8 +1,18 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap');
 
 @theme {
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
   --font-signature: "Dancing Script", cursive;
+
+  /* Luxury Palette */
+  --color-midnight: #0a0f1a;
+  --color-gold: #c5a059;
+  --color-gold-light: #d4b982;
+  --color-cool-grey: #f8fafc;
+  --color-warm-grey: #f5f2ed;
+  
   /* Override default oklch colors with hex for html2canvas compatibility */
   --color-slate-50: #f8fafc;
   --color-slate-100: #f1f5f9;
@@ -25,66 +35,23 @@
   --color-blue-700: #1d4ed8;
   --color-blue-800: #1e40af;
   --color-blue-900: #1e3a8a;
+}
 
-  /* Adding other common palettes just in case */
-  --color-gray-50: #f9fafb;
-  --color-gray-100: #f3f4f6;
-  --color-gray-200: #e5e7eb;
-  --color-gray-300: #d1d5db;
-  --color-gray-400: #9ca3af;
-  --color-gray-500: #6b7280;
-  --color-gray-600: #4b5563;
-  --color-gray-700: #374151;
-  --color-gray-800: #1f2937;
-  --color-gray-900: #111827;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply font-sans bg-cool-grey text-midnight;
+  }
+  h1, h2, h3, h4 {
+    @apply font-serif;
+  }
+}
 
-  --color-zinc-50: #fafafa;
-  --color-zinc-100: #f4f4f5;
-  --color-zinc-200: #e4e4e7;
-  --color-zinc-300: #d4d4d8;
-  --color-zinc-400: #a1a1aa;
-  --color-zinc-500: #71717a;
-  --color-zinc-600: #52525b;
-  --color-zinc-700: #3f3f46;
-  --color-zinc-800: #27272a;
-  --color-zinc-900: #18181b;
-
-  --color-neutral-50: #fafafa;
-  --color-neutral-100: #f5f5f5;
-  --color-neutral-200: #e5e5e5;
-  --color-neutral-300: #d4d4d4;
-  --color-neutral-400: #a3a3a3;
-  --color-neutral-500: #737373;
-  --color-neutral-600: #525252;
-  --color-neutral-700: #404040;
-  --color-neutral-800: #262626;
-  --color-neutral-900: #171717;
-
-  --color-stone-50: #fafaf9;
-  --color-stone-100: #f5f5f4;
-  --color-stone-200: #e7e5e4;
-  --color-stone-300: #d6d3d1;
-  --color-stone-400: #a8a29e;
-  --color-stone-500: #78716c;
-  --color-stone-600: #57534e;
-  --color-stone-700: #44403c;
-  --color-stone-800: #292524;
-  --color-stone-900: #1c1917;
-
-  --color-white: #ffffff;
-  --color-black: #000000;
-  --color-transparent: transparent;
-
-  --color-red-500: #ef4444;
-  --color-red-600: #dc2626;
-  --color-green-500: #10b981;
-  --color-green-600: #059669;
-  --color-yellow-500: #f59e0b;
-  --color-yellow-600: #d97706;
-  --color-emerald-500: #10b981;
-  --color-emerald-600: #059669;
-  --color-amber-500: #f59e0b;
-  --color-amber-600: #d97706;
-  --color-rose-500: #f43f5e;
-  --color-rose-600: #e11d48;
+@layer utilities {
+  .text-outline {
+    -webkit-text-stroke: 1px currentColor;
+    color: transparent;
+  }
 }

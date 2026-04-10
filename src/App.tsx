@@ -140,74 +140,65 @@ export default function App() {
         windowWidth: captureWidth,
         onclone: (clonedDoc) => {
           const clonedElement = clonedDoc.getElementById('pdf-content');
-          const observationsSection = clonedDoc.getElementById('observations-section');
-          
-          if (clonedElement && observationsSection) {
+          if (clonedElement) {
             clonedElement.style.width = `${captureWidth}px`;
             clonedElement.style.height = 'auto';
             
-            // Cria um espaçador para empurrar as observações para a segunda página
-            // A altura de uma página A4 proporcional à nossa largura de 800px é aprox 1130px
-            const spacer = clonedDoc.createElement('div');
-            spacer.style.height = '150px'; // Ajuste fino para empurrar para a próxima página
-            spacer.className = 'pdf-spacer';
-            observationsSection.parentNode?.insertBefore(spacer, observationsSection);
+            // Inject styles for PDF
+            const style = clonedDoc.createElement('style');
+            style.innerHTML = `
+              @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;700&family=Dancing+Script&display=swap');
+              
+              :root {
+                --color-midnight: #0a0f1a;
+                --color-gold: #c5a059;
+                --color-gold-light: #d4b982;
+                --color-cool-grey: #f8fafc;
+                --color-warm-grey: #f5f2ed;
+              }
+
+              #pdf-content {
+                font-family: 'Inter', sans-serif !important;
+                color: var(--color-midnight) !important;
+                background: white !important;
+                box-shadow: none !important;
+                width: ${captureWidth}px !important;
+              }
+
+              .font-serif {
+                font-family: 'Playfair Display', serif !important;
+              }
+
+              .font-signature {
+                font-family: 'Dancing Script', cursive !important;
+                color: var(--color-midnight) !important;
+              }
+
+              .bg-midnight { background-color: var(--color-midnight) !important; color: white !important; }
+              .bg-gold { background-color: var(--color-gold) !important; color: white !important; }
+              .bg-warm-grey { background-color: var(--color-warm-grey) !important; }
+              .text-gold { color: var(--color-gold) !important; }
+              .text-midnight { color: var(--color-midnight) !important; }
+              .border-gold { border-color: var(--color-gold) !important; }
+              
+              input, textarea, select {
+                border-color: #e2e8f0 !important;
+                color: var(--color-midnight) !important;
+                background: transparent !important;
+              }
+
+              .no-print { display: none !important; }
+              * { box-shadow: none !important; text-shadow: none !important; }
+              
+              svg path, svg circle {
+                stroke: var(--color-gold) !important;
+              }
+              .bg-midnight svg path, .bg-midnight svg circle {
+                stroke: var(--color-gold) !important;
+              }
+            `;
+            clonedDoc.head.appendChild(style);
           }
-          
-          const style = clonedDoc.createElement('style');
-          style.innerHTML = `
-            #pdf-content {
-              background: white !important;
-              box-shadow: none !important;
-              width: ${captureWidth}px !important;
-            }
-            #pdf-content * {
-              box-shadow: none !important;
-              text-shadow: none !important;
-              border-color: #d1d5db !important;
-              color: black !important;
-            }
-            #pdf-content .no-print { display: none !important; }
-            #pdf-content .bg-blue-600 { background-color: #2563eb !important; color: white !important; }
-            #pdf-content .bg-blue-900 { background-color: #111827 !important; color: white !important; }
-            #pdf-content .bg-slate-50 { background-color: #f9fafb !important; }
-            #pdf-content .bg-blue-500 { background-color: #374151 !important; }
-            #pdf-content .bg-blue-200 { background-color: #e5e7eb !important; }
-            
-            /* Fallbacks para cores oklch do Tailwind v4 que o html2canvas não suporta */
-            #pdf-content .text-slate-500 { color: #64748b !important; }
-            #pdf-content .text-slate-700 { color: #334155 !important; }
-            #pdf-content .text-slate-400 { color: #94a3b8 !important; }
-            #pdf-content .text-blue-600 { color: #2563eb !important; }
-            #pdf-content .text-blue-400 { color: #60a5fa !important; }
-            #pdf-content .text-blue-300 { color: #93c5fd !important; }
-            #pdf-content .border-slate-200 { border-color: #e2e8f0 !important; }
-            #pdf-content .border-slate-300 { border-color: #cbd5e1 !important; }
-            
-            #pdf-content input, 
-            #pdf-content textarea, 
-            #pdf-content select {
-              border-bottom-color: #9ca3af !important;
-              background: transparent !important;
-            }
-            
-            #pdf-content svg path, 
-            #pdf-content svg circle {
-              fill: black !important;
-              stroke: black !important;
-            }
-            #pdf-content .bg-blue-900 svg text,
-            #pdf-content .bg-blue-900 svg path,
-            #pdf-content .bg-blue-900 svg circle {
-              fill: white !important;
-              stroke: white !important;
-            }
-            #pdf-content .font-signature { 
-              font-family: "Dancing Script", cursive !important; 
-              color: #1e3a8a !important;
-            }
-          `;
-          clonedDoc.head.appendChild(style);
         }
       });
       
@@ -248,201 +239,253 @@ export default function App() {
 
   if (view === 'landing') {
     return (
-      <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-blue-100">
+      <div className="min-h-screen bg-cool-grey font-sans text-midnight selection:bg-gold/20">
         {/* Navigation */}
-        <nav className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
-          <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+        <nav className="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-xl border-b border-white/20">
+          <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+            <div className="flex items-center gap-4">
               <img 
                 src={logo} 
                 alt="F&E Clean Logo" 
-                className="h-12 w-auto object-contain"
+                className="h-14 w-auto object-contain brightness-0"
                 referrerPolicy="no-referrer"
               />
-              <span className="font-bold text-xl tracking-tight text-blue-900">F&E Clean</span>
+              <div className="flex flex-col">
+                <span className="font-serif font-bold text-2xl tracking-tight leading-none">F&E Clean</span>
+                <span className="text-[10px] uppercase tracking-[0.3em] text-gold font-bold">Boutique de Higienização</span>
+              </div>
             </div>
             
             {/* Desktop Menu */}
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#inicio" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Início</a>
-              <a href="#servicos" className="text-sm font-medium text-slate-600 hover:text-blue-600 transition-colors">Serviços</a>
+            <div className="hidden md:flex items-center gap-12">
+              <a href="#inicio" className="text-xs font-bold uppercase tracking-widest text-midnight/60 hover:text-gold transition-colors">Início</a>
+              <a href="#servicos" className="text-xs font-bold uppercase tracking-widest text-midnight/60 hover:text-gold transition-colors">Serviços</a>
+              <a href="#diferenciais" className="text-xs font-bold uppercase tracking-widest text-midnight/60 hover:text-gold transition-colors">Diferenciais</a>
               <button 
                 onClick={() => setView('generator')}
-                className="px-6 py-2.5 bg-blue-600 text-white rounded-full text-sm font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-95"
+                className="px-8 py-3 bg-midnight text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-gold transition-all shadow-xl shadow-midnight/10 active:scale-95"
               >
                 Gerador de OS
               </button>
             </div>
 
             {/* Mobile Menu Toggle */}
-            <button className="md:hidden text-slate-600" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className="md:hidden text-midnight" onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
           </div>
 
           {/* Mobile Menu */}
-          {isMenuOpen && (
-            <motion.div 
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="md:hidden bg-white border-b border-slate-100 px-6 py-8 flex flex-col gap-6"
-            >
-              <a href="#inicio" className="text-lg font-medium text-slate-600" onClick={() => setIsMenuOpen(false)}>Início</a>
-              <a href="#servicos" className="text-lg font-medium text-slate-600" onClick={() => setIsMenuOpen(false)}>Serviços</a>
-              <button 
-                onClick={() => { setView('generator'); setIsMenuOpen(false); }}
-                className="w-full py-4 bg-blue-600 text-white rounded-xl font-semibold"
+          <AnimatePresence>
+            {isMenuOpen && (
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="md:hidden bg-white border-b border-slate-100 px-6 py-8 flex flex-col gap-6 overflow-hidden"
               >
-                Gerador de OS
-              </button>
-            </motion.div>
-          )}
+                <a href="#inicio" className="text-sm font-bold uppercase tracking-widest text-midnight" onClick={() => setIsMenuOpen(false)}>Início</a>
+                <a href="#servicos" className="text-sm font-bold uppercase tracking-widest text-midnight" onClick={() => setIsMenuOpen(false)}>Serviços</a>
+                <button 
+                  onClick={() => { setView('generator'); setIsMenuOpen(false); }}
+                  className="w-full py-5 bg-midnight text-white rounded-2xl font-bold uppercase tracking-widest text-xs"
+                >
+                  Gerador de OS
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </nav>
 
         {/* Hero Section */}
-        <section id="inicio" className="pt-32 pb-20 px-6 overflow-hidden">
+        <section id="inicio" className="relative pt-48 pb-32 px-6">
           <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8 }}
-                className="lg:col-span-7"
+                transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+                className="lg:col-span-7 z-10"
               >
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-100 mb-8">
-                  <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-                  <span className="text-[10px] font-black uppercase tracking-widest text-blue-600">Premium Cleaning Service</span>
+                <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-gold/10 border border-gold/20 mb-10">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-gold">Estética Residencial de Alto Padrão</span>
                 </div>
-                <h1 className="text-6xl md:text-8xl font-black leading-[0.9] mb-8 tracking-tighter text-slate-900">
+                <h1 className="text-7xl md:text-[120px] font-serif font-black leading-[0.85] mb-10 tracking-tighter">
                   RENOVE <br />
-                  <span className="text-blue-600 italic">SEU CONFORTO.</span>
+                  <span className="text-outline text-midnight">SEU</span> <br />
+                  <span className="text-gold italic">CONFORTO.</span>
                 </h1>
-                <p className="text-xl text-slate-500 mb-12 max-w-xl leading-relaxed font-medium">
-                  Especialistas em higienização técnica e impermeabilização de estofados. Tecnologia avançada para um ambiente impecável.
+                <p className="text-xl text-slate-500 mb-14 max-w-lg leading-relaxed font-light">
+                  Uma curadoria técnica em higienização e blindagem de estofados. Transformamos o cuidado em uma experiência de luxo e bem-estar.
                 </p>
-                <div className="flex flex-wrap gap-6">
+                <div className="flex flex-wrap gap-8 items-center">
                   <button 
                     onClick={() => setView('generator')}
-                    className="h-16 px-10 bg-blue-600 text-white rounded-2xl font-bold flex items-center gap-3 hover:bg-blue-700 transition-all shadow-2xl shadow-blue-200 active:scale-95 group"
+                    className="h-18 px-12 bg-midnight text-white rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-gold transition-all shadow-2xl shadow-midnight/20 active:scale-95 group"
                   >
                     Gerar Ordem de Serviço
-                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
                   </button>
                   <a 
                     href="https://wa.me/5516920047362" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="h-16 px-10 bg-white border-2 border-slate-900 text-slate-900 rounded-2xl font-bold flex items-center gap-3 hover:bg-slate-900 hover:text-white transition-all active:scale-95"
+                    className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-midnight hover:text-gold transition-colors group"
                   >
-                    WhatsApp
-                    <MessageCircle size={20} className="text-green-500" />
+                    <div className="w-12 h-12 rounded-full border border-midnight/10 flex items-center justify-center group-hover:border-gold transition-colors">
+                      <MessageCircle size={20} />
+                    </div>
+                    Consultoria via WhatsApp
                   </a>
                 </div>
               </motion.div>
 
               <motion.div
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 1, delay: 0.2 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
                 className="lg:col-span-5 relative"
               >
-                <div className="relative aspect-[4/5] bg-slate-100 rounded-[40px] overflow-hidden shadow-2xl border-8 border-white group">
+                <div className="relative aspect-[4/5] rounded-[60px] overflow-hidden shadow-3xl group">
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={currentImageIndex}
-                      initial={{ opacity: 0, scale: 1.1 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ duration: 0.8, ease: "circOut" }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 1.2 }}
                       className="absolute inset-0"
                     >
                       <img 
                         src={heroImages[currentImageIndex].url} 
-                        alt={`F&E Clean Showcase ${currentImageIndex + 1}`}
+                        alt="F&E Clean Showcase"
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
-                      
-                      {/* Image Label */}
-                      <motion.div 
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="absolute bottom-8 left-8"
-                      >
-                        <span className="px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-[10px] font-black uppercase tracking-widest text-white">
-                          {heroImages[currentImageIndex].label}
-                        </span>
-                      </motion.div>
+                      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-midnight/40" />
                     </motion.div>
                   </AnimatePresence>
 
                   {/* Progress Indicators */}
-                  <div className="absolute bottom-8 right-8 flex gap-1.5">
+                  <div className="absolute bottom-12 left-1/2 -translate-x-1/2 flex gap-3">
                     {heroImages.map((_, i) => (
                       <div 
                         key={i}
-                        className={`h-1 rounded-full transition-all duration-500 ${
-                          i === currentImageIndex ? "w-6 bg-white" : "w-1.5 bg-white/30"
+                        className={`h-1 rounded-full transition-all duration-700 ${
+                          i === currentImageIndex ? "w-8 bg-white" : "w-2 bg-white/30"
                         }`}
                       />
                     ))}
                   </div>
-
-                  {/* Floating Badge */}
-                  <div className="absolute top-12 -left-20 bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 hidden md:block z-10">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center">
-                        <ShieldCheck className="text-green-600" size={24} />
-                      </div>
-                      <div>
-                        <p className="text-xs font-black uppercase tracking-widest text-slate-400">Certificado</p>
-                        <p className="text-sm font-bold text-slate-900">Garantia Total</p>
-                      </div>
+                </div>
+                
+                {/* Floating Glass Badge */}
+                <div className="absolute -bottom-10 -left-10 bg-white/80 backdrop-blur-xl p-8 rounded-[40px] shadow-2xl border border-white/50 hidden xl:block z-20">
+                  <div className="flex items-center gap-5">
+                    <div className="w-14 h-14 bg-gold rounded-2xl flex items-center justify-center text-white">
+                      <ShieldCheck size={28} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-gold mb-1">Certificação Premium</p>
+                      <p className="text-lg font-serif font-bold text-midnight">Garantia Vitalícia de Cuidado</p>
                     </div>
                   </div>
                 </div>
-                {/* Decorative Elements */}
-                <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-blue-600 rounded-full blur-3xl opacity-20" />
-                <div className="absolute -top-6 -left-6 w-32 h-32 bg-blue-400 rounded-full blur-3xl opacity-20" />
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* Bento Grid: Diferenciais Técnicos */}
+        <section id="diferenciais" className="py-32 px-6 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-24">
+              <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold mb-4 block">The Gold Standard</span>
+              <h2 className="text-5xl md:text-7xl font-serif font-black tracking-tighter">DIFERENCIAIS <span className="italic text-gold">TÉCNICOS</span></h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-6 h-auto md:h-[700px]">
+              <motion.div 
+                whileHover={{ y: -5 }}
+                className="md:col-span-2 md:row-span-2 bg-warm-grey rounded-[48px] p-12 flex flex-col justify-between border border-midnight/5 group overflow-hidden relative"
+              >
+                <div className="z-10">
+                  <div className="w-16 h-16 bg-midnight rounded-2xl flex items-center justify-center text-white mb-8">
+                    <WashingMachine size={32} />
+                  </div>
+                  <h3 className="text-4xl font-serif font-bold mb-6">Tecnologia de Extração Molecular</h3>
+                  <p className="text-slate-500 leading-relaxed max-w-sm">Utilizamos equipamentos de última geração que removem sujidades em nível microscópico, preservando a integridade das fibras mais delicadas.</p>
+                </div>
+                <img src={foto3} className="absolute -bottom-10 -right-10 w-64 h-64 object-cover rounded-full opacity-20 group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
+              </motion.div>
+
+              <motion.div 
+                whileHover={{ y: -5 }}
+                className="md:col-span-2 bg-midnight rounded-[48px] p-10 text-white flex items-center gap-8 border border-white/10"
+              >
+                <div className="w-20 h-20 bg-gold rounded-full flex-shrink-0 flex items-center justify-center">
+                  <ShieldCheck size={36} />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-serif font-bold mb-2">Blindagem Nanotecnológica</h3>
+                  <p className="text-white/60 text-sm leading-relaxed">Proteção invisível que repele líquidos e evita manchas sem alterar o toque do tecido.</p>
+                </div>
+              </motion.div>
+
+              <motion.div 
+                whileHover={{ y: -5 }}
+                className="bg-gold rounded-[48px] p-10 text-white flex flex-col justify-center text-center"
+              >
+                <Droplets size={40} className="mx-auto mb-4" />
+                <h3 className="text-xl font-serif font-bold mb-2">Eco-Friendly</h3>
+                <p className="text-white/80 text-xs">Produtos biodegradáveis e atóxicos.</p>
+              </motion.div>
+
+              <motion.div 
+                whileHover={{ y: -5 }}
+                className="bg-cool-grey rounded-[48px] p-10 flex flex-col justify-center text-center border border-midnight/5"
+              >
+                <Wind size={40} className="mx-auto mb-4 text-midnight" />
+                <h3 className="text-xl font-serif font-bold mb-2 text-midnight">Secagem Express</h3>
+                <p className="text-slate-500 text-xs">Ambiente pronto para uso em tempo recorde.</p>
               </motion.div>
             </div>
           </div>
         </section>
 
         {/* Services Section */}
-        <section id="servicos" className="py-32 bg-slate-50 px-6">
+        <section id="servicos" className="py-32 bg-cool-grey px-6">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-20 gap-8">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-24 gap-8">
               <div className="max-w-2xl">
-                <h2 className="text-4xl md:text-6xl font-black tracking-tighter mb-6 uppercase">Nossos <br /><span className="text-blue-600">Serviços</span></h2>
-                <p className="text-lg text-slate-500 font-medium">Excelência técnica em cada detalhe, do sofá ao colchão.</p>
+                <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold mb-4 block">Nossa Expertise</span>
+                <h2 className="text-5xl md:text-7xl font-serif font-black tracking-tighter uppercase leading-none">SERVIÇOS <br /><span className="text-gold">EXCLUSIVOS</span></h2>
               </div>
               <button 
                 onClick={() => setView('generator')}
-                className="text-sm font-black uppercase tracking-widest text-blue-600 border-b-2 border-blue-600 pb-1 hover:text-blue-800 hover:border-blue-800 transition-colors"
+                className="text-xs font-bold uppercase tracking-widest text-midnight border-b border-midnight pb-2 hover:text-gold hover:border-gold transition-all"
               >
-                Ver todos os serviços
+                Solicitar Orçamento Personalizado
               </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {[
-                { title: 'Higienização', icon: <Droplets size={32} />, desc: 'Limpeza profunda com extração de sujidades e microrganismos.', color: 'bg-blue-500' },
-                { title: 'Impermeabilização', icon: <ShieldCheck size={32} />, desc: 'Blindagem contra líquidos e aumento da vida útil do tecido.', color: 'bg-slate-900' },
-                { title: 'Odorização', icon: <Wind size={32} />, desc: 'Neutralização de odores e fragrância exclusiva de limpeza.', color: 'bg-blue-600' }
+                { title: 'Higienização', icon: <Droplets size={32} />, desc: 'Tratamento profundo que remove ácaros, fungos e bactérias, devolvendo a pureza ao seu estofado.', color: 'bg-white' },
+                { title: 'Impermeabilização', icon: <ShieldCheck size={32} />, desc: 'Aplicação de polímeros de alta performance que criam uma barreira protetora definitiva.', color: 'bg-midnight text-white' },
+                { title: 'Revitalização', icon: <Wind size={32} />, desc: 'Processo exclusivo para tecidos nobres como linho e seda, recuperando o brilho e a maciez original.', color: 'bg-gold text-white' }
               ].map((service, i) => (
                 <motion.div 
                   key={i}
-                  whileHover={{ y: -10 }}
-                  className={`${service.color} p-12 rounded-[40px] text-white flex flex-col h-[400px] justify-between group cursor-pointer shadow-xl`}
+                  whileHover={{ y: -15 }}
+                  className={`${service.color} p-14 rounded-[60px] flex flex-col h-[480px] justify-between group cursor-pointer shadow-2xl shadow-midnight/5 border border-midnight/5`}
                 >
-                  <div className="w-16 h-16 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <div className={`w-20 h-20 ${service.color === 'bg-white' ? 'bg-cool-grey' : 'bg-white/10'} rounded-[24px] flex items-center justify-center group-hover:scale-110 transition-transform`}>
                     {service.icon}
                   </div>
                   <div>
-                    <h3 className="text-3xl font-bold mb-4 tracking-tight">{service.title}</h3>
-                    <p className="text-white/70 font-medium leading-relaxed">{service.desc}</p>
+                    <h3 className="text-4xl font-serif font-bold mb-6 tracking-tight">{service.title}</h3>
+                    <p className={`${service.color === 'bg-white' ? 'text-slate-500' : 'text-white/70'} font-light leading-relaxed text-lg`}>{service.desc}</p>
                   </div>
                 </motion.div>
               ))}
@@ -453,29 +496,26 @@ export default function App() {
         {/* Results Gallery Section */}
         <section className="py-32 bg-white px-6">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-20">
-              <p className="text-[10px] font-black uppercase tracking-widest text-blue-600 mb-4">Nosso Processo</p>
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter uppercase">Galeria de <br /><span className="text-blue-600">Resultados</span></h2>
+            <div className="text-center mb-24">
+              <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold mb-4 block">Portfólio</span>
+              <h2 className="text-5xl md:text-7xl font-serif font-black tracking-tighter uppercase">GALERIA DE <span className="text-gold italic">EXCELÊNCIA</span></h2>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               {heroImages.map((img, i) => (
                 <motion.div 
                   key={i}
-                  whileHover={{ scale: 1.02 }}
-                  className="relative aspect-square rounded-3xl overflow-hidden shadow-lg group cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative aspect-square rounded-[40px] overflow-hidden shadow-2xl group cursor-pointer"
                 >
                   <img 
                     src={img.url} 
                     alt={`Resultado ${i + 1}`}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute inset-0 bg-slate-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-[10px] font-black uppercase tracking-widest text-white">
-                      {img.label}
-                    </span>
-                  </div>
+                  <div className="absolute inset-0 bg-midnight/20 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </motion.div>
               ))}
             </div>
@@ -483,39 +523,44 @@ export default function App() {
         </section>
 
         {/* Footer */}
-        <footer className="bg-white border-t border-slate-100 pt-32 pb-12 px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-16 mb-32">
+        <footer className="bg-midnight text-white pt-40 pb-16 px-6 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-gold/5 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2" />
+          
+          <div className="max-w-7xl mx-auto relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-20 mb-40">
               <div className="md:col-span-6">
-                <div className="flex items-center gap-4 mb-10">
+                <div className="flex items-center gap-5 mb-14">
                   <img 
                     src={logo} 
                     alt="F&E Clean Logo" 
-                    className="h-16 w-auto object-contain"
+                    className="h-20 w-auto object-contain brightness-0 invert"
                     referrerPolicy="no-referrer"
                   />
-                  <span className="font-black text-2xl tracking-tighter uppercase">F&E Clean</span>
+                  <div className="flex flex-col">
+                    <span className="font-serif font-bold text-3xl tracking-tighter uppercase">F&E Clean</span>
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-gold">Boutique de Higienização</span>
+                  </div>
                 </div>
-                <h3 className="text-4xl md:text-5xl font-black tracking-tighter mb-10 leading-none">
-                  PRONTO PARA <br />
-                  <span className="text-blue-600">TRANSFORMAR</span> <br />
-                  SEU AMBIENTE?
+                <h3 className="text-5xl md:text-7xl font-serif font-black tracking-tighter mb-16 leading-[0.9]">
+                  O PADRÃO OURO <br />
+                  EM <span className="text-gold italic">CUIDADO</span> <br />
+                  RESIDENCIAL.
                 </h3>
-                <div className="flex gap-4">
+                <div className="flex flex-wrap gap-6">
                   <a 
                     href="https://wa.me/5516920047362" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="h-14 px-8 bg-green-500 text-white rounded-2xl font-bold flex items-center gap-3 hover:bg-green-600 transition-all shadow-xl shadow-green-100 active:scale-95"
+                    className="h-16 px-10 bg-gold text-white rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-gold-light transition-all shadow-2xl shadow-gold/20 active:scale-95"
                   >
-                    WhatsApp
+                    Agendar Agora
                     <MessageCircle size={20} />
                   </a>
                   <a 
                     href="https://instagram.com/feclean1" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="w-14 h-14 bg-slate-100 text-slate-900 rounded-2xl flex items-center justify-center hover:bg-slate-900 hover:text-white transition-all active:scale-95"
+                    className="w-16 h-16 border border-white/20 text-white rounded-full flex items-center justify-center hover:bg-white hover:text-midnight transition-all active:scale-95"
                   >
                     <Instagram size={24} />
                   </a>
@@ -523,29 +568,30 @@ export default function App() {
               </div>
 
               <div className="md:col-span-3">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-8">Navegação</p>
-                <ul className="space-y-6">
-                  <li><a href="#inicio" className="text-lg font-bold hover:text-blue-600 transition-colors">Início</a></li>
-                  <li><a href="#servicos" className="text-lg font-bold hover:text-blue-600 transition-colors">Serviços</a></li>
-                  <li><button onClick={() => setView('generator')} className="text-lg font-bold hover:text-blue-600 transition-colors">Gerador de OS</button></li>
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold mb-10">Explorar</p>
+                <ul className="space-y-8">
+                  <li><a href="#inicio" className="text-lg font-serif hover:text-gold transition-colors">Início</a></li>
+                  <li><a href="#servicos" className="text-lg font-serif hover:text-gold transition-colors">Serviços</a></li>
+                  <li><a href="#diferenciais" className="text-lg font-serif hover:text-gold transition-colors">Diferenciais</a></li>
+                  <li><button onClick={() => setView('generator')} className="text-lg font-serif hover:text-gold transition-colors">Gerador de OS</button></li>
                 </ul>
               </div>
 
               <div className="md:col-span-3">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-8">Contato</p>
-                <ul className="space-y-6">
-                  <li className="text-lg font-bold">(16) 920047362</li>
-                  <li className="text-lg font-bold text-slate-400">fe.cleanhigienizacao@gmail.com</li>
-                  <li className="text-lg font-bold text-slate-400">Ribeirão Preto, SP</li>
+                <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold mb-10">Contato</p>
+                <ul className="space-y-8">
+                  <li className="text-xl font-serif">(16) 920047362</li>
+                  <li className="text-lg font-serif text-white/40">fe.cleanhigienizacao@gmail.com</li>
+                  <li className="text-lg font-serif text-white/40">Ribeirão Preto, SP</li>
                 </ul>
               </div>
             </div>
             
-            <div className="pt-12 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6 text-[10px] font-black uppercase tracking-widest text-slate-400">
-              <p>© 2026 F&E Clean. Todos os direitos reservados.</p>
-              <div className="flex gap-8">
-                <a href="#" className="hover:text-slate-900 transition-colors">Privacidade</a>
-                <a href="#" className="hover:text-slate-900 transition-colors">Termos</a>
+            <div className="pt-16 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] font-bold uppercase tracking-[0.4em] text-white/30">
+              <p>© 2026 F&E Clean. Excellence in every fiber.</p>
+              <div className="flex gap-12">
+                <a href="#" className="hover:text-gold transition-colors">Privacidade</a>
+                <a href="#" className="hover:text-gold transition-colors">Termos de Uso</a>
               </div>
             </div>
           </div>
@@ -555,38 +601,38 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-100 py-8 px-4 sm:px-6 lg:px-8 font-sans text-slate-900">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-cool-grey py-12 px-4 sm:px-6 lg:px-8 font-sans text-midnight">
+      <div className="max-w-5xl mx-auto">
         {/* Header Actions */}
-        <div className="flex justify-between items-center mb-6 no-print">
-          <div className="flex items-center gap-4">
+        <div className="flex justify-between items-center mb-10 no-print">
+          <div className="flex items-center gap-6">
             <button 
               onClick={() => setView('landing')}
-              className="p-2 hover:bg-slate-200 rounded-full transition-colors"
+              className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-lg hover:bg-gold hover:text-white transition-all active:scale-95"
               title="Voltar para o site"
             >
-              <ArrowRight className="rotate-180 text-slate-600" size={24} />
+              <ArrowRight className="rotate-180" size={20} />
             </button>
-            <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-              <ClipboardCheck className="text-blue-600" />
-              Gerador de OS
+            <h1 className="text-3xl font-serif font-bold text-midnight flex items-center gap-3">
+              <ClipboardCheck className="text-gold" size={32} />
+              Gerador de Ordem de Serviço
             </h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-4">
             <button
               onClick={clearSignatures}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-600 hover:bg-slate-50 transition-colors shadow-sm text-sm"
+              className="flex items-center gap-2 px-5 py-2.5 bg-white border border-midnight/10 rounded-full text-midnight/60 hover:text-midnight hover:border-midnight transition-all shadow-sm text-xs font-bold uppercase tracking-widest"
             >
               <Eraser size={16} />
-              Limpar Assinaturas
+              Limpar
             </button>
             <button
               onClick={generatePDF}
               disabled={isGenerating}
-              className="flex items-center gap-1.5 px-4 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all shadow-md disabled:opacity-50 text-sm font-medium"
+              className="flex items-center gap-2 px-6 py-2.5 bg-midnight text-white rounded-full hover:bg-gold transition-all shadow-xl shadow-midnight/10 disabled:opacity-50 text-xs font-bold uppercase tracking-widest"
             >
               {isGenerating ? (
-                <span className="animate-spin rounded-full h-3.5 w-3.5 border-2 border-white border-t-transparent" />
+                <span className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
               ) : (
                 <Download size={16} />
               )}
@@ -601,105 +647,112 @@ export default function App() {
           animate={{ opacity: 1, y: 0 }}
           ref={formRef}
           id="pdf-content"
-          className="bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 relative"
-          style={{ minHeight: '1120px' }} // A4 aspect ratio approx
+          className="bg-white shadow-3xl rounded-[40px] overflow-hidden border border-midnight/5 relative"
+          style={{ minHeight: '1120px' }}
         >
           {/* Logo Section */}
-          <div className="p-8 text-center border-b-4 border-blue-900">
-            <div className="flex flex-col items-center justify-center mb-4">
+          <div className="p-12 text-center bg-midnight text-white relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gold/10 blur-[80px] rounded-full -translate-y-1/2 translate-x-1/2" />
+            <div className="flex flex-col items-center justify-center mb-8 relative z-10">
               <img 
                 src={logo} 
                 alt="F&E Clean Logo" 
-                className="h-32 w-auto object-contain"
+                className="h-32 w-auto object-contain brightness-0 invert"
                 referrerPolicy="no-referrer"
               />
             </div>
-            <h3 className="text-3xl font-bold text-blue-900 mt-4 tracking-[0.3em] uppercase border-y-2 border-[#BCC4DC] py-4">
-              Ordem de Serviço
-            </h3>
+            <div className="relative z-10">
+              <h3 className="text-4xl font-serif font-bold mt-4 tracking-[0.2em] uppercase">
+                Ordem de Serviço
+              </h3>
+              <p className="text-gold text-xs font-bold uppercase tracking-[0.4em] mt-4 opacity-80">Boutique de Higienização de Estofados</p>
+            </div>
           </div>
 
-          <div className="p-8 space-y-8">
+          <div className="p-12 space-y-12">
             {/* Section: Cliente */}
             <section>
-              <h4 className="flex items-center gap-2 text-lg font-bold text-blue-900 uppercase mb-4 border-l-4 border-blue-900 pl-3">
-                <User size={20} /> Cliente
+              <h4 className="flex items-center gap-3 text-xl font-serif font-bold text-midnight uppercase mb-8 border-l-4 border-gold pl-4">
+                <User size={24} className="text-gold" /> Identificação do Cliente
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Nome do Cliente</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nome Completo</label>
                   <input
                     type="text"
                     name="clientName"
                     value={formData.clientName}
                     onChange={handleInputChange}
-                    className="w-full border-b-2 border-slate-200 focus:border-blue-600 outline-none py-2 text-lg font-medium transition-colors"
-                    placeholder="Ex: João Silva"
+                    className="w-full border-b border-slate-200 focus:border-gold outline-none py-3 text-xl font-serif font-medium transition-colors bg-transparent"
+                    placeholder="Ex: Sr. João Silva"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Telefone</label>
-                  <div className="flex items-center gap-2 border-b-2 border-slate-200 focus-within:border-blue-600 transition-colors">
-                    <Phone size={16} className="text-slate-400" />
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Contato</label>
+                  <div className="flex items-center gap-3 border-b border-slate-200 focus-within:border-gold transition-colors">
+                    <Phone size={18} className="text-slate-300" />
                     <input
                       type="text"
                       name="phone"
                       value={formData.phone}
                       onChange={handleInputChange}
-                      className="w-full outline-none py-2 text-lg font-medium"
+                      className="w-full outline-none py-3 text-xl font-serif font-medium bg-transparent"
                       placeholder="(00) 00000-0000"
                     />
                   </div>
                 </div>
                 <div className="md:col-span-1">
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Data</label>
-                  <div className="flex items-center gap-2 border-b-2 border-slate-200 focus-within:border-blue-600 transition-colors">
-                    <Calendar size={16} className="text-slate-400" />
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Data do Serviço</label>
+                  <div className="flex items-center gap-3 border-b border-slate-200 focus-within:border-gold transition-colors">
+                    <Calendar size={18} className="text-slate-300" />
                     <input
                       type="date"
                       name="date"
                       value={formData.date}
                       onChange={handleInputChange}
-                      className="w-full outline-none py-2 text-lg font-medium"
+                      className="w-full outline-none py-3 text-xl font-serif font-medium bg-transparent"
                     />
                   </div>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Serviço a ser Executado</label>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">Modalidade de Serviço</label>
                   <select
                     name="serviceType"
                     value={formData.serviceType}
                     onChange={handleInputChange}
-                    className="w-full border-b-2 border-slate-200 focus:border-blue-600 outline-none py-2 text-lg font-medium bg-transparent cursor-pointer"
+                    className="w-full border-b border-slate-200 focus:border-gold outline-none py-3 text-xl font-serif font-medium bg-transparent cursor-pointer"
                   >
-                    <option value="Higienização">Higienização</option>
-                    <option value="Impermeabilização">Impermeabilização</option>
-                    <option value="Ambos">Ambos</option>
+                    <option value="Higienização">Higienização Técnica</option>
+                    <option value="Impermeabilização">Blindagem Nanotecnológica</option>
+                    <option value="Ambos">Higienização + Blindagem</option>
                   </select>
                 </div>
               </div>
             </section>
 
             {/* Section: Análise Técnica */}
-            <section className="bg-slate-50 p-6 rounded-xl border border-slate-200">
-              <h4 className="flex items-center gap-2 text-lg font-bold text-blue-900 uppercase mb-6 border-l-4 border-blue-900 pl-3">
-                <Info size={20} /> Análise Técnica
+            <section className="bg-warm-grey/50 p-10 rounded-[40px] border border-midnight/5">
+              <h4 className="flex items-center gap-3 text-xl font-serif font-bold text-midnight uppercase mb-10 border-l-4 border-gold pl-4">
+                <Info size={24} className="text-gold" /> Laudo Técnico Preliminar
               </h4>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                 {/* Tipo de Superfície */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-3">Tipo de Superfície (Tecido)</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Composição Têxtil</label>
+                  <div className="grid grid-cols-2 gap-4">
                     {FABRIC_OPTIONS.map(fabric => (
-                      <label key={fabric} className="flex items-center gap-2 cursor-pointer group">
+                      <label key={fabric} className="flex items-center gap-3 cursor-pointer group">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.fabrics.includes(fabric) ? 'border-gold bg-gold' : 'border-slate-300 bg-white'}`}>
+                          {formData.fabrics.includes(fabric) && <div className="w-2 h-2 bg-white rounded-full" />}
+                        </div>
                         <input
                           type="checkbox"
                           checked={formData.fabrics.includes(fabric)}
                           onChange={() => toggleArrayItem('fabrics', fabric)}
-                          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          className="hidden"
                         />
-                        <span className="text-sm text-slate-700 group-hover:text-blue-600 transition-colors">{fabric}</span>
+                        <span className="text-sm font-medium text-slate-600 group-hover:text-gold transition-colors">{fabric}</span>
                       </label>
                     ))}
                   </div>
@@ -707,50 +760,47 @@ export default function App() {
 
                 {/* Grau de Sujidade */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-3 text-center">Grau de Sujidade</label>
-                  <div className="relative pt-2 pb-2">
-                    <div className="flex h-8 w-full rounded-md overflow-hidden border border-slate-300">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6 text-center">Nível de Contaminação</label>
+                  <div className="relative pt-4 pb-4">
+                    <div className="flex h-10 w-full rounded-full overflow-hidden border border-slate-200 bg-white p-1">
                       <button 
                         onClick={() => setFormData(prev => ({ ...prev, dirtLevel: 'Leve' }))}
-                        className={`flex-1 transition-all ${formData.dirtLevel === 'Leve' ? 'bg-blue-200' : 'bg-white hover:bg-slate-50'}`}
-                      />
+                        className={`flex-1 rounded-full transition-all ${formData.dirtLevel === 'Leve' ? 'bg-gold/20 text-gold' : 'text-slate-400 hover:bg-slate-50'}`}
+                      >
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Leve</span>
+                      </button>
                       <button 
                         onClick={() => setFormData(prev => ({ ...prev, dirtLevel: 'Moderado' }))}
-                        className={`flex-1 border-x border-slate-300 transition-all ${formData.dirtLevel === 'Moderado' ? 'bg-blue-500' : 'bg-white hover:bg-slate-50'}`}
-                      />
+                        className={`flex-1 rounded-full transition-all ${formData.dirtLevel === 'Moderado' ? 'bg-gold text-white' : 'text-slate-400 hover:bg-slate-50'}`}
+                      >
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Moderado</span>
+                      </button>
                       <button 
                         onClick={() => setFormData(prev => ({ ...prev, dirtLevel: 'Intenso' }))}
-                        className={`flex-1 transition-all ${formData.dirtLevel === 'Intenso' ? 'bg-blue-900' : 'bg-white hover:bg-slate-50'}`}
-                      />
-                    </div>
-                    <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase mt-2 px-1">
-                      <span className={formData.dirtLevel === 'Leve' ? 'text-blue-600' : ''}>Leve</span>
-                      <span className={formData.dirtLevel === 'Moderado' ? 'text-blue-600' : ''}>Moderado</span>
-                      <span className={formData.dirtLevel === 'Intenso' ? 'text-blue-900' : ''}>Intenso</span>
-                    </div>
-                    {/* Visual pointer like in the image */}
-                    <div 
-                      className="absolute -top-1 transition-all duration-300"
-                      style={{ left: formData.dirtLevel === 'Leve' ? '16.6%' : formData.dirtLevel === 'Moderado' ? '50%' : '83.3%' }}
-                    >
-                      <div className="w-0 h-0 border-l-[6px] border-l-transparent border-r-[6px] border-r-transparent border-t-[8px] border-t-blue-900 -ml-[6px]" />
+                        className={`flex-1 rounded-full transition-all ${formData.dirtLevel === 'Intenso' ? 'bg-midnight text-white' : 'text-slate-400 hover:bg-slate-50'}`}
+                      >
+                        <span className="text-[10px] font-bold uppercase tracking-widest">Intenso</span>
+                      </button>
                     </div>
                   </div>
                 </div>
 
                 {/* Situação do Estofado */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-3">Situação do Estofado</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Condição Estrutural</label>
+                  <div className="grid grid-cols-2 gap-4">
                     {CONDITION_OPTIONS.map(opt => (
-                      <label key={opt} className="flex items-center gap-2 cursor-pointer group">
+                      <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.conditions.includes(opt) ? 'border-gold bg-gold' : 'border-slate-300 bg-white'}`}>
+                          {formData.conditions.includes(opt) && <div className="w-2 h-2 bg-white rounded-full" />}
+                        </div>
                         <input
                           type="checkbox"
                           checked={formData.conditions.includes(opt)}
                           onChange={() => toggleArrayItem('conditions', opt)}
-                          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          className="hidden"
                         />
-                        <span className="text-sm text-slate-700 group-hover:text-blue-600 transition-colors">{opt}</span>
+                        <span className="text-sm font-medium text-slate-600 group-hover:text-gold transition-colors">{opt}</span>
                       </label>
                     ))}
                   </div>
@@ -758,73 +808,71 @@ export default function App() {
 
                 {/* Tipo de Sujeira */}
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 uppercase mb-3">TIPO DE SUJEIRA</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-6">Agentes Contaminantes</label>
+                  <div className="grid grid-cols-2 gap-4">
                     {DIRT_TYPE_OPTIONS.map(opt => (
-                      <label key={opt} className="flex items-center gap-2 cursor-pointer group">
+                      <label key={opt} className="flex items-center gap-3 cursor-pointer group">
+                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${formData.dirtTypes.includes(opt) ? 'border-gold bg-gold' : 'border-slate-300 bg-white'}`}>
+                          {formData.dirtTypes.includes(opt) && <div className="w-2 h-2 bg-white rounded-full" />}
+                        </div>
                         <input
                           type="checkbox"
                           checked={formData.dirtTypes.includes(opt)}
                           onChange={() => toggleArrayItem('dirtTypes', opt)}
-                          className="w-4 h-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          className="hidden"
                         />
-                        <span className="text-sm text-slate-700 group-hover:text-blue-600 transition-colors">{opt}</span>
+                        <span className="text-sm font-medium text-slate-600 group-hover:text-gold transition-colors">{opt}</span>
                       </label>
                     ))}
                   </div>
-                  {formData.dirtTypes.includes('Outros') && (
-                    <input
-                      type="text"
-                      className="w-full mt-2 border-b border-slate-300 focus:border-blue-600 outline-none text-sm py-1 transition-colors"
-                      placeholder="Especifique outros..."
-                    />
-                  )}
                 </div>
               </div>
             </section>
 
             {/* Section: Observações */}
             <section id="observations-section">
-              <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Observações</label>
+              <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4">Notas Adicionais e Observações Especiais</label>
               <textarea
                 name="observations"
                 value={formData.observations}
                 onChange={handleInputChange}
                 rows={4}
-                className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:border-blue-600 outline-none transition-colors resize-none text-slate-700"
-                placeholder="Detalhes adicionais sobre o serviço..."
+                className="w-full p-8 bg-warm-grey/30 border border-midnight/5 rounded-[32px] focus:border-gold outline-none transition-all resize-none text-midnight font-serif text-lg leading-relaxed"
+                placeholder="Descreva aqui detalhes específicos do serviço..."
               />
             </section>
 
             {/* Section: Signatures & Price */}
-            <section className="grid grid-cols-1 md:grid-cols-3 gap-8 pt-8">
+            <section className="grid grid-cols-1 md:grid-cols-3 gap-12 pt-12">
               <div className="md:col-span-1">
-                <label className="block text-xs font-bold text-slate-500 uppercase mb-2 text-center">Assinatura do Técnico</label>
-                <div className="border-b-2 border-slate-300 bg-[#FBFCFD] rounded-t-lg h-24 flex items-center justify-center">
-                  <span className="font-signature text-3xl text-blue-900">Fábio Sinhoreli Aguiar</span>
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 text-center">Responsável Técnico</label>
+                <div className="border-b border-gold bg-cool-grey rounded-t-[24px] h-28 flex flex-col items-center justify-center">
+                  <span className="font-signature text-3xl text-midnight">Fábio Sinhoreli Aguiar</span>
+                  <span className="text-[8px] uppercase tracking-widest text-gold mt-1 font-bold">F&E Clean Specialist</span>
                 </div>
               </div>
               <div className="md:col-span-1">
-                <label className="block text-xs font-bold text-slate-500 uppercase mb-2 text-center">Assinatura do Cliente</label>
-                <div className="border-b-2 border-slate-300 bg-[#FBFCFD] rounded-t-lg">
+                <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 text-center">Assinatura do Cliente</label>
+                <div className="border-b border-gold bg-cool-grey rounded-t-[24px]">
                   <SignatureCanvas
                     ref={clientSigRef}
-                    penColor="#1e3a8a"
-                    canvasProps={{ className: "w-full h-24 cursor-crosshair" }}
+                    penColor="#0a0f1a"
+                    canvasProps={{ className: "w-full h-28 cursor-crosshair" }}
                   />
                 </div>
               </div>
               <div className="md:col-span-1">
-                <div className="bg-blue-600 text-white p-4 rounded-xl shadow-lg">
-                  <label className="block text-[10px] font-bold uppercase mb-1 opacity-80">Valor do Serviço</label>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl font-black">R$</span>
+                <div className="bg-midnight text-white p-8 rounded-[32px] shadow-3xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gold/20 blur-[40px] rounded-full -translate-y-1/2 translate-x-1/2" />
+                  <label className="block text-[10px] font-bold uppercase tracking-widest mb-3 text-gold relative z-10">Investimento</label>
+                  <div className="flex items-center gap-3 relative z-10">
+                    <span className="text-2xl font-serif font-bold text-gold">R$</span>
                     <input
                       type="text"
                       name="price"
                       value={formData.price}
                       onChange={handleInputChange}
-                      className="w-full bg-transparent border-b-2 border-white/30 focus:border-white outline-none text-3xl font-black py-1 transition-colors"
+                      className="w-full bg-transparent border-b border-white/20 focus:border-gold outline-none text-4xl font-serif font-bold py-1 transition-colors"
                       placeholder="0,00"
                     />
                   </div>
@@ -834,26 +882,26 @@ export default function App() {
           </div>
 
           {/* Footer Info */}
-          <div className="p-8 bg-slate-50 border-t border-slate-200 mt-auto">
-            <div className="flex flex-wrap justify-between items-center gap-6 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-              <div className="flex items-center gap-2">
-                <ShieldCheck size={14} className="text-blue-600" />
-                Garantia de Qualidade F&E Clean
+          <div className="p-12 bg-midnight text-white/40 border-t border-white/5 mt-auto">
+            <div className="flex flex-wrap justify-between items-center gap-10 text-[9px] font-bold uppercase tracking-[0.3em]">
+              <div className="flex items-center gap-3">
+                <ShieldCheck size={16} className="text-gold" />
+                Selo de Qualidade F&E Clean
               </div>
-              <div className="flex items-center gap-2">
-                <Droplets size={14} className="text-blue-400" />
-                Produtos Biodegradáveis
+              <div className="flex items-center gap-3">
+                <Droplets size={16} className="text-gold" />
+                Ativos Biodegradáveis
               </div>
-              <div className="flex items-center gap-2">
-                <Wind size={14} className="text-blue-300" />
-                Secagem Rápida
+              <div className="flex items-center gap-3">
+                <Wind size={16} className="text-gold" />
+                Secagem Inteligente
               </div>
-              <div className="flex items-center gap-2 text-slate-600">
-                <Phone size={14} className="text-blue-600" />
+              <div className="flex items-center gap-3 text-white/60">
+                <Phone size={16} className="text-gold" />
                 (16) 920047362
               </div>
-              <div className="flex items-center gap-2 text-slate-600">
-                <Instagram size={14} className="text-blue-600" />
+              <div className="flex items-center gap-3 text-white/60">
+                <Instagram size={16} className="text-gold" />
                 @feclean1
               </div>
             </div>
@@ -861,16 +909,16 @@ export default function App() {
         </motion.div>
 
         {/* Floating Action Button (Mobile) */}
-        <div className="fixed bottom-8 right-8 no-print block md:hidden">
+        <div className="fixed bottom-10 right-10 no-print block md:hidden z-50">
           <button
             onClick={generatePDF}
             disabled={isGenerating}
-            className="w-14 h-14 bg-blue-600 text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform active:scale-95"
+            className="w-16 h-16 bg-midnight text-white rounded-full shadow-3xl flex items-center justify-center hover:bg-gold transition-all active:scale-95"
           >
             {isGenerating ? (
               <span className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent" />
             ) : (
-              <Download size={24} />
+              <Download size={28} />
             )}
           </button>
         </div>
@@ -880,25 +928,18 @@ export default function App() {
         @media print {
           .no-print { display: none !important; }
           body { background: white; padding: 0; }
-          .shadow-2xl { shadow: none !important; }
+          .shadow-3xl { shadow: none !important; }
         }
         
-        input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 24px;
-          height: 24px;
-          background: white;
-          border: 4px solid #1e3a8a;
-          border-radius: 50%;
-          cursor: pointer;
-          box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-        }
-
         input[type="date"]::-webkit-calendar-picker-indicator {
           cursor: pointer;
           opacity: 0.5;
           filter: invert(0.5);
+        }
+
+        ::selection {
+          background: #c5a059;
+          color: white;
         }
       `}</style>
     </div>

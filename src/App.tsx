@@ -252,7 +252,7 @@ export default function App() {
               />
               <div className="flex flex-col">
                 <span className="font-serif font-bold text-2xl tracking-tight leading-none">F&E Clean</span>
-                <span className="text-[10px] uppercase tracking-[0.3em] text-gold font-bold">Boutique de Higienização</span>
+                <span className="text-[10px] uppercase tracking-[0.3em] text-gold font-bold">Higienização de Estofados</span>
               </div>
             </div>
             
@@ -538,7 +538,7 @@ export default function App() {
                   />
                   <div className="flex flex-col">
                     <span className="font-serif font-bold text-3xl tracking-tighter uppercase">F&E Clean</span>
-                    <span className="text-[10px] uppercase tracking-[0.4em] text-gold">Boutique de Higienização</span>
+                    <span className="text-[10px] uppercase tracking-[0.4em] text-gold">Higienização de Estofados</span>
                   </div>
                 </div>
                 <h3 className="text-5xl md:text-7xl font-serif font-black tracking-tighter mb-16 leading-[0.9]">
@@ -665,7 +665,7 @@ export default function App() {
               <h3 className="text-4xl font-serif font-bold mt-4 tracking-[0.2em] uppercase">
                 Ordem de Serviço
               </h3>
-              <p className="text-gold text-xs font-bold uppercase tracking-[0.4em] mt-4 opacity-80">Boutique de Higienização de Estofados</p>
+              <p className="text-gold text-xs font-bold uppercase tracking-[0.4em] mt-4 opacity-80">Higienização de Estofados</p>
             </div>
           </div>
 

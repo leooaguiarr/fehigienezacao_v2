@@ -248,7 +248,6 @@ export default function App() {
                 src={logo} 
                 alt="F&E Clean Logo" 
                 className="h-14 w-auto object-contain brightness-0"
-                referrerPolicy="no-referrer"
               />
               <div className="flex flex-col">
                 <span className="font-serif font-bold text-2xl tracking-tight leading-none">F&E Clean</span>
@@ -416,7 +415,7 @@ export default function App() {
                   <h3 className="text-4xl font-serif font-bold mb-6">Tecnologia de Extração</h3>
                   <p className="text-slate-500 leading-relaxed max-w-sm">Utilizamos equipamentos de alta performance que removem sujidades incrustadas e microrganismos, preservando a integridade das fibras.</p>
                 </div>
-                <img src={foto3} className="absolute -bottom-10 -right-10 w-64 h-64 object-cover rounded-full opacity-20 group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
+                <img src={foto3} className="absolute -bottom-10 -right-10 w-64 h-64 object-cover rounded-full opacity-20 group-hover:scale-110 transition-transform duration-700" />
               </motion.div>
 
               <motion.div 
@@ -534,7 +533,6 @@ export default function App() {
                     src={logo} 
                     alt="F&E Clean Logo" 
                     className="h-20 w-auto object-contain brightness-0 invert"
-                    referrerPolicy="no-referrer"
                   />
                   <div className="flex flex-col">
                     <span className="font-serif font-bold text-3xl tracking-tighter uppercase">F&E Clean</span>
@@ -658,7 +656,6 @@ export default function App() {
                 src={logo} 
                 alt="F&E Clean Logo" 
                 className="h-32 w-auto object-contain brightness-0 invert"
-                referrerPolicy="no-referrer"
               />
             </div>
             <div className="relative z-10">

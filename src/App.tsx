@@ -312,7 +312,7 @@ export default function App() {
                 </div>
                 <h1 className="text-7xl md:text-[120px] font-serif font-black leading-[0.85] mb-10 tracking-tighter">
                   RENOVE <br />
-                  <span className="text-outline text-midnight">SEU</span> <br />
+                  <span className="text-midnight">SEU</span> <br />
                   <span className="text-gold italic">CONFORTO.</span>
                 </h1>
                 <p className="text-xl text-slate-500 mb-14 max-w-lg leading-relaxed font-light">
@@ -446,8 +446,8 @@ export default function App() {
                 className="bg-cool-grey rounded-[48px] p-10 flex flex-col justify-center text-center border border-midnight/5"
               >
                 <Wind size={40} className="mx-auto mb-4 text-midnight" />
-                <h3 className="text-xl font-serif font-bold mb-2 text-midnight">Secagem Express</h3>
-                <p className="text-slate-500 text-xs">Ambiente pronto para uso em tempo recorde.</p>
+                <h3 className="text-xl font-serif font-bold mb-2 text-midnight">Secagem Controlada</h3>
+                <p className="text-slate-500 text-xs">Processo técnico que otimiza o tempo de secagem, garantindo a preservação das fibras.</p>
               </motion.div>
             </div>
           </div>

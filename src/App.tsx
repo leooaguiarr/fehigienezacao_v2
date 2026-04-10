@@ -316,7 +316,7 @@ export default function App() {
                   <span className="text-gold italic">CONFORTO.</span>
                 </h1>
                 <p className="text-xl text-slate-500 mb-14 max-w-lg leading-relaxed font-light">
-                  Uma curadoria técnica em higienização e blindagem de estofados. Transformamos o cuidado em uma experiência de luxo e bem-estar.
+                  Uma curadoria técnica em higienização e blindagem de estofados. Transformamos o cuidado em uma experiência única e bem-estar.
                 </p>
                 <div className="flex flex-wrap gap-8 items-center">
                   <button 
@@ -413,8 +413,8 @@ export default function App() {
                   <div className="w-16 h-16 bg-midnight rounded-2xl flex items-center justify-center text-white mb-8">
                     <WashingMachine size={32} />
                   </div>
-                  <h3 className="text-4xl font-serif font-bold mb-6">Tecnologia de Extração Molecular</h3>
-                  <p className="text-slate-500 leading-relaxed max-w-sm">Utilizamos equipamentos de última geração que removem sujidades em nível microscópico, preservando a integridade das fibras mais delicadas.</p>
+                  <h3 className="text-4xl font-serif font-bold mb-6">Tecnologia de Extração</h3>
+                  <p className="text-slate-500 leading-relaxed max-w-sm">Utilizamos equipamentos de alta performance que removem sujidades incrustadas e microrganismos, preservando a integridade das fibras.</p>
                 </div>
                 <img src={foto3} className="absolute -bottom-10 -right-10 w-64 h-64 object-cover rounded-full opacity-20 group-hover:scale-110 transition-transform duration-700" referrerPolicy="no-referrer" />
               </motion.div>

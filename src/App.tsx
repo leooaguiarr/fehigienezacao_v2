@@ -460,12 +460,14 @@ export default function App() {
                 <span className="text-[10px] font-bold uppercase tracking-[0.4em] text-gold mb-4 block">Nossa Expertise</span>
                 <h2 className="text-5xl md:text-7xl font-serif font-black tracking-tighter uppercase leading-none">SERVIÇOS <br /><span className="text-gold">EXCLUSIVOS</span></h2>
               </div>
-              <button 
-                onClick={() => setView('generator')}
+              <a 
+                href="https://wa.me/5516920047362"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-xs font-bold uppercase tracking-widest text-midnight border-b border-midnight pb-2 hover:text-gold hover:border-gold transition-all"
               >
                 Solicitar Orçamento Personalizado
-              </button>
+              </a>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

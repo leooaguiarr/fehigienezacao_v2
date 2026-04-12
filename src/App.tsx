@@ -24,8 +24,8 @@ import {
   X
 } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+import { domToCanvas } from 'modern-screenshot';
 
 // Import local images
 import foto1 from './foto_1.png';
@@ -124,6 +124,9 @@ export default function App() {
     setIsGenerating(true);
 
     try {
+      // Pequeno delay para garantir que qualquer transição de UI terminou
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       const element = formRef.current;
       
       // Forçamos uma largura fixa para a captura para garantir layout de desktop no mobile
@@ -131,81 +134,23 @@ export default function App() {
       const originalWidth = element.style.width;
       element.style.width = `${captureWidth}px`;
 
-      const canvas = await html2canvas(element, {
+      // modern-screenshot é muito mais robusto com CSS moderno (oklch/oklab)
+      const canvas = await domToCanvas(element, {
         scale: 2,
-        useCORS: true,
-        logging: false,
         backgroundColor: '#ffffff',
         width: captureWidth,
-        windowWidth: captureWidth,
-        onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.getElementById('pdf-content');
-          if (clonedElement) {
-            clonedElement.style.width = `${captureWidth}px`;
-            clonedElement.style.height = 'auto';
-            
-            // Inject styles for PDF
-            const style = clonedDoc.createElement('style');
-            style.innerHTML = `
-              @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;700&family=Dancing+Script&display=swap');
-              
-              :root {
-                --color-midnight: #0a0f1a;
-                --color-gold: #c5a059;
-                --color-gold-light: #d4b982;
-                --color-cool-grey: #f8fafc;
-                --color-warm-grey: #f5f2ed;
-              }
-
-              #pdf-content {
-                font-family: 'Inter', sans-serif !important;
-                color: var(--color-midnight) !important;
-                background: white !important;
-                box-shadow: none !important;
-                width: ${captureWidth}px !important;
-              }
-
-              .font-serif {
-                font-family: 'Playfair Display', serif !important;
-              }
-
-              .font-signature {
-                font-family: 'Dancing Script', cursive !important;
-                color: var(--color-midnight) !important;
-              }
-
-              .bg-midnight { background-color: var(--color-midnight) !important; color: white !important; }
-              .bg-gold { background-color: var(--color-gold) !important; color: white !important; }
-              .bg-warm-grey { background-color: var(--color-warm-grey) !important; }
-              .text-gold { color: var(--color-gold) !important; }
-              .text-midnight { color: var(--color-midnight) !important; }
-              .border-gold { border-color: var(--color-gold) !important; }
-              
-              input, textarea, select {
-                border-color: #e2e8f0 !important;
-                color: var(--color-midnight) !important;
-                background: transparent !important;
-              }
-
-              .no-print { display: none !important; }
-              * { box-shadow: none !important; text-shadow: none !important; }
-              
-              svg path, svg circle {
-                stroke: var(--color-gold) !important;
-              }
-              .bg-midnight svg path, .bg-midnight svg circle {
-                stroke: var(--color-gold) !important;
-              }
-            `;
-            clonedDoc.head.appendChild(style);
-          }
-        }
+        height: element.scrollHeight,
       });
       
       // Restaura a largura original
       element.style.width = originalWidth;
 
       const imgData = canvas.toDataURL('image/png');
+      
+      if (imgData === 'data:,') {
+        throw new Error('Falha ao capturar imagem do formulário (canvas vazio).');
+      }
+
       const pdf = new jsPDF('p', 'mm', 'a4');
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -229,9 +174,11 @@ export default function App() {
         heightLeft -= pdfHeight;
       }
 
-      pdf.save(`OS_FE_Clean_${formData.clientName.replace(/\s+/g, '_') || 'Sem_Nome'}.pdf`);
+      const fileName = `OS_FE_Clean_${formData.clientName.replace(/\s+/g, '_') || 'Sem_Nome'}.pdf`;
+      pdf.save(fileName);
     } catch (error) {
-      console.error('Erro ao gerar PDF:', error);
+      console.error('Erro detalhado ao gerar PDF:', error);
+      alert('Houve um erro ao gerar o PDF. Por favor, tente novamente ou verifique se todos os campos estão preenchidos.');
     } finally {
       setIsGenerating(false);
     }

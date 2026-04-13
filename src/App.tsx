@@ -536,7 +536,7 @@ export default function App() {
             
             <div className="pt-16 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-8 text-[10px] font-bold uppercase tracking-[0.4em] text-white/30">
               <div className="flex flex-col md:flex-row items-center gap-4 text-center md:text-left">
-                <p>© 2026 F&E Clean. Excellence in every fiber.</p>
+                <p>© 2026 F&E Clean. Excelência em cada fibra.</p>
                 <span className="hidden md:block opacity-20">|</span>
                 <p>Desenvolvido por <span className="text-gold/50">Lexion Consultoria</span></p>
               </div>

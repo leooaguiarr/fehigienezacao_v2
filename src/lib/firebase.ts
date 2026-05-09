@@ -2,17 +2,13 @@ import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: "AIzaSyDiXy4uSqus41pPa1817ZoQG2KmXSFwVMY",
+  authDomain: "fehizienizacao.firebaseapp.com",
+  projectId: "fehizienizacao",
+  storageBucket: "fehizienizacao.firebasestorage.app",
+  messagingSenderId: "212072636994",
+  appId: "1:212072636994:web:5095eb49196737c89683db",
 };
 
 export const app = initializeApp(firebaseConfig);
-console.log('Firebase Config loaded:', {
-  hasApiKey: !!firebaseConfig.apiKey,
-  projectId: firebaseConfig.projectId
-});
 export const db = getFirestore(app);

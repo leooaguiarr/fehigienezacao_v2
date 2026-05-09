@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\leooa\\\\OneDrive\\\\Documentos\\\\Antigravity\\\\fe_higienizacao\\\\fehigienezacao_v2-main\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(npm run *)"
+    ]
+  }
+}

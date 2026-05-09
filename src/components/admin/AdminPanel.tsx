@@ -60,7 +60,14 @@ export default function AdminPanel({ onLogout }: Props) {
   };
 
   const handleOSSaved = () => {
-    loadData();
+    // Atualiza os dados em segundo plano sem a tela de loading 
+    // para evitar que o OSGenerator seja desmontado e o formulário limpo
+    Promise.all([getServiceOrders(), getAppointments()])
+      .then(([osList, appts]) => {
+        setOrders(osList);
+        setAppointments(appts);
+      })
+      .catch(console.error);
   };
 
   const switchTab = (t: AdminTab) => {

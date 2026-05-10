@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 import { saveServiceOrder, updateServiceOrder } from '../lib/db';
 import type { ServiceOrder, ServiceType, DirtLevel, OSStatus } from '../types';
 import logo from '../logo_sem_fundo.png';
@@ -113,47 +113,27 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
       const originalWidth = element.style.width;
       element.style.width = `${captureWidth}px`;
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
+      // Pequeno atraso para garantir que estilos estejam aplicados
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      const imgData = await toPng(element, {
+        cacheBust: true,
+        pixelRatio: 2,
         backgroundColor: '#ffffff',
         width: captureWidth,
-        windowWidth: captureWidth,
-        onclone: (clonedDoc) => {
-          const el = clonedDoc.getElementById('pdf-content');
-          if (el) {
-            el.style.width = `${captureWidth}px`;
-            el.style.height = 'auto';
-            const style = clonedDoc.createElement('style');
-            style.innerHTML = `
-              @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;700&family=Dancing+Script&display=swap');
-              :root { --color-midnight: #0c1222; --color-gold: #0891b2; --color-gold-light: #22d3ee; }
-              #pdf-content { font-family: 'Inter', sans-serif !important; background: white !important; box-shadow: none !important; width: ${captureWidth}px !important; }
-              .font-serif { font-family: 'Playfair Display', serif !important; }
-              .font-signature { font-family: 'Dancing Script', cursive !important; color: var(--color-midnight) !important; }
-              .bg-midnight { background-color: var(--color-midnight) !important; color: white !important; }
-              .bg-gold { background-color: var(--color-gold) !important; color: white !important; }
-              .bg-warm-grey { background-color: #f0f7fa !important; }
-              .text-gold { color: var(--color-gold) !important; }
-              .text-midnight { color: var(--color-midnight) !important; }
-              .border-gold { border-color: var(--color-gold) !important; }
-              input, textarea, select { border-color: #e2e8f0 !important; color: var(--color-midnight) !important; background: transparent !important; }
-              .no-print { display: none !important; }
-              * { box-shadow: none !important; text-shadow: none !important; }
-            `;
-            clonedDoc.head.appendChild(style);
-          }
+        style: {
+          width: `${captureWidth}px`,
+          transform: 'none',
         },
       });
 
       element.style.width = originalWidth;
 
-      const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgHeight = (canvas.height * pdfWidth) / canvas.width;
+      const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
       let heightLeft = imgHeight;
       let position = 0;

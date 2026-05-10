@@ -346,8 +346,8 @@ export default function Scheduling({ appointments, onRefresh }: Props) {
                   <select value={form.serviceType} onChange={e => setForm(p => ({ ...p, serviceType: e.target.value as ServiceType }))}
                     className="w-full glass-strong border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white bg-slate-800 outline-none focus:border-gold transition-colors cursor-pointer">
                     <option value="Higienização">Higienização Técnica</option>
-                    <option value="Impermeabilização">Blindagem Nanotecnológica</option>
-                    <option value="Ambos">Higienização + Blindagem</option>
+                    <option value="Impermeabilização">Impermeabilização</option>
+                    <option value="Ambos">Higienização + Impermeabilização</option>
                   </select>
                 </div>
                 {editAppt && (

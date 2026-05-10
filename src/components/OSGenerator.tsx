@@ -279,8 +279,8 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
                   <select name="serviceType" value={formData.serviceType} onChange={handleInputChange}
                     className="w-full border border-slate-200 focus:border-gold outline-none py-2.5 px-4 text-base font-medium bg-white cursor-pointer rounded-lg text-slate-800">
                     <option value="Higienização">Higienização Técnica</option>
-                    <option value="Impermeabilização">Blindagem Nanotecnológica</option>
-                    <option value="Ambos">Higienização + Blindagem</option>
+                    <option value="Impermeabilização">Impermeabilização</option>
+                    <option value="Ambos">Higienização + Impermeabilização</option>
                   </select>
                 </div>
               </div>

@@ -190,7 +190,7 @@ function LandingPage() {
                 <span className="text-gold italic">CONFORTO.</span>
               </h1>
               <p className="text-xl text-white/50 mb-14 max-w-lg leading-relaxed font-light">
-                Uma curadoria técnica em higienização e blindagem de estofados. Transformamos o cuidado em uma experiência única e bem-estar.
+                Uma curadoria técnica em higienização e impermeabilização de estofados. Transformamos o cuidado em uma experiência única e bem-estar.
               </p>
               <div className="flex flex-wrap gap-8 items-center">
                 <button
@@ -282,7 +282,7 @@ function LandingPage() {
             <motion.div whileHover={{ y: -5 }} className="md:col-span-2 glass-strong rounded-[48px] p-10 text-white flex items-center gap-8">
               <div className="w-20 h-20 bg-gold rounded-full flex-shrink-0 flex items-center justify-center"><ShieldCheck size={36} /></div>
               <div>
-                <h3 className="text-2xl font-serif font-bold mb-2">Blindagem Nanotecnológica</h3>
+                <h3 className="text-2xl font-serif font-bold mb-2">Impermeabilização</h3>
                 <p className="text-white/50 text-sm leading-relaxed">Proteção invisível que repele líquidos e evita manchas sem alterar o toque do tecido.</p>
               </div>
             </motion.div>

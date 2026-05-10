@@ -70,6 +70,17 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+    if (!value) {
+      setFormData(prev => ({ ...prev, price: '' }));
+      return;
+    }
+    const numberValue = parseInt(value, 10) / 100;
+    const formatted = numberValue.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    setFormData(prev => ({ ...prev, price: formatted }));
+  };
+
   const toggleArrayItem = (name: keyof typeof formData, item: string) => {
     setFormData((prev) => {
       const current = prev[name] as string[];
@@ -105,6 +116,9 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
   };
 
   const generatePDF = async () => {
+    const confirm = window.confirm('ATENÇÃO: Você já clicou em "Salvar OS"?\n\nSe você baixar sem salvar, essa OS não aparecerá no painel depois.\n\nClique em OK para Baixar o PDF, ou Cancelar para voltar e salvar primeiro.');
+    if (!confirm) return;
+
     if (!formRef.current) return;
     setIsGenerating(true);
     try {
@@ -362,7 +376,7 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
                   <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 text-center">Investimento</label>
                   <div className="bg-slate-800 text-white p-6 rounded-xl h-24 flex items-center gap-3">
                     <span className="text-xl font-serif font-bold text-gold">R$</span>
-                    <input type="text" name="price" value={formData.price} onChange={handleInputChange}
+                    <input type="text" name="price" value={formData.price} onChange={handlePriceChange}
                       className="w-full bg-transparent border-b border-white/20 focus:border-gold outline-none text-3xl font-serif font-bold transition-colors"
                       placeholder="0,00" />
                   </div>

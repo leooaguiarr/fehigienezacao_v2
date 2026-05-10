@@ -96,6 +96,24 @@ export default function Scheduling({ appointments, onRefresh }: Props) {
     if (!form.clientName || !form.appointmentDate || !form.appointmentTime) {
       return alert('Preencha nome, data e horário.');
     }
+
+    const newTimeMinutes = parseInt(form.appointmentTime.split(':')[0]) * 60 + parseInt(form.appointmentTime.split(':')[1]);
+    
+    const conflictingAppt = appointments.find(a => {
+      if (editAppt && a.id === editAppt.id) return false;
+      if (a.status === 'cancelado') return false;
+      if (a.appointmentDate !== form.appointmentDate) return false;
+      
+      const existingTimeMinutes = parseInt(a.appointmentTime.split(':')[0]) * 60 + parseInt(a.appointmentTime.split(':')[1]);
+      const diff = Math.abs(newTimeMinutes - existingTimeMinutes);
+      
+      return diff < 180;
+    });
+
+    if (conflictingAppt) {
+      return alert(`Horário indisponível!\n\nJá existe um agendamento para ${conflictingAppt.clientName} às ${conflictingAppt.appointmentTime}.\nÉ necessário um intervalo mínimo de 3 horas entre os serviços.`);
+    }
+
     setSaving(true);
     try {
       if (editAppt?.id) {

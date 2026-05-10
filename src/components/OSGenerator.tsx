@@ -133,18 +133,16 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
       const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      // Calcula a proporção para caber exatamente em 1 página
+      const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
+      const scaledWidth = imgProps.width * ratio;
+      const scaledHeight = imgProps.height * ratio;
 
-      let heightLeft = imgHeight;
-      let position = 0;
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-      heightLeft -= pdfHeight;
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, imgHeight);
-        heightLeft -= pdfHeight;
-      }
+      // Centraliza horizontalmente e alinha ao topo
+      const x = (pdfWidth - scaledWidth) / 2;
+      
+      pdf.addImage(imgData, 'PNG', x, 0, scaledWidth, scaledHeight);
       pdf.save(`OS_FE_Clean_${formData.clientName.replace(/\s+/g, '_') || 'Sem_Nome'}.pdf`);
     } catch (error) {
       console.error('Erro ao gerar PDF:', error);

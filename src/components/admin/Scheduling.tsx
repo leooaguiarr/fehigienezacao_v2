@@ -231,95 +231,100 @@ export default function Scheduling({ appointments, onRefresh }: Props) {
             })}
           </div>
 
-          {/* Selected day appointments */}
-          {selectedDate && (
-            <div className="mt-6 border-t border-white/5 pt-5">
-              <div className="flex items-center justify-between mb-3">
-                <h4 className="text-sm font-bold text-white">
-                  {new Date(selectedDate + 'T12:00').toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}
-                </h4>
-                <button onClick={() => openNew(selectedDate)} className="text-xs text-gold font-bold hover:text-gold-light transition-colors flex items-center gap-1">
-                  <Plus size={12} /> Novo
-                </button>
-              </div>
-              {selectedAppts.length === 0 ? (
-                <p className="text-white/20 text-sm text-center py-4">Nenhum agendamento neste dia</p>
-              ) : (
-                <div className="space-y-2">
-                  {selectedAppts.map(a => (
-                    <div key={a.id} className="flex items-center justify-between gap-3 py-2 px-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors group">
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className="text-xs font-bold text-gold flex-shrink-0">{a.appointmentTime}</span>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-white truncate">{a.clientName}</p>
-                          <p className="text-xs text-white/30">{a.serviceType} · {a.phone}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 ${STATUS_CONFIG[a.status].cls}`}>
-                          {STATUS_CONFIG[a.status].icon} {STATUS_CONFIG[a.status].label}
-                        </span>
-                        <button onClick={() => openEdit(a)} className="w-7 h-7 flex items-center justify-center rounded-lg bg-gold/10 text-gold active:bg-gold active:text-white transition-all">
-                          <Edit size={12} />
-                        </button>
-                        <button onClick={() => setConfirmDelete(a.id!)} className="w-7 h-7 flex items-center justify-center rounded-lg bg-red-500/10 text-red-400 active:bg-red-500 active:text-white transition-all">
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
 
-        {/* Upcoming list */}
-        <div className="glass rounded-2xl p-6 border border-white/5">
-          <h3 className="text-sm font-bold text-white/60 uppercase tracking-widest mb-4">Próximos</h3>
-          {upcomingAppts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-48 text-white/20">
-              <Calendar size={32} className="mb-3" />
-              <p className="text-xs">Nenhum agendamento futuro</p>
+        {/* Right Panel: Selected Date OR Upcoming list */}
+        {selectedDate ? (
+          <div className="glass rounded-2xl p-6 border border-gold/30 bg-gold/5 shadow-2xl shadow-gold/5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-sm font-bold text-gold uppercase tracking-widest">
+                {new Date(selectedDate + 'T12:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}
+              </h3>
+              <button onClick={() => openNew(selectedDate)} className="text-xs text-gold font-bold hover:text-gold-light transition-colors flex items-center gap-1">
+                <Plus size={12} /> Novo
+              </button>
             </div>
-          ) : (
-            <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
-              {upcomingAppts.map(a => (
-                <div key={a.id} className="rounded-xl bg-white/5 p-3 hover:bg-white/10 transition-colors group">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold text-white truncate">{a.clientName}</p>
-                      <p className="text-xs text-white/40 mt-0.5">
-                        {new Date(a.appointmentDate + 'T12:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })} às {a.appointmentTime}
-                      </p>
-                      <p className="text-xs text-white/30 mt-0.5">{a.serviceType}</p>
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 ${STATUS_CONFIG[a.status].cls}`}>
-                        {STATUS_CONFIG[a.status].label}
-                      </span>
-                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        {a.status === 'agendado' && (
-                          <button onClick={() => handleStatusChange(a.id!, 'confirmado')} className="text-[9px] text-emerald-400 font-bold hover:text-emerald-300 transition-colors">Confirmar</button>
-                        )}
-                        {(a.status === 'agendado' || a.status === 'confirmado') && (
-                          <button onClick={() => handleStatusChange(a.id!, 'concluido')} className="text-[9px] text-teal-400 font-bold hover:text-teal-300 transition-colors ml-1">Concluir</button>
-                        )}
+            {selectedAppts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-48 text-gold/40">
+                <Calendar size={32} className="mb-3 opacity-50" />
+                <p className="text-xs">Livre neste dia</p>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                {selectedAppts.map(a => (
+                  <div key={a.id} className="rounded-xl bg-gold/10 p-3 hover:bg-gold/20 transition-colors group border border-gold/10">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{a.clientName}</p>
+                        <p className="text-xs font-bold text-gold mt-0.5">{a.appointmentTime}</p>
+                        <p className="text-xs text-white/50 mt-0.5">{a.serviceType} · {a.phone}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 ${STATUS_CONFIG[a.status].cls}`}>
+                          {STATUS_CONFIG[a.status].label}
+                        </span>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+                           <button onClick={() => openEdit(a)} className="w-6 h-6 flex items-center justify-center rounded-lg bg-gold/20 text-gold hover:bg-gold hover:text-white transition-all">
+                             <Edit size={10} />
+                           </button>
+                           <button onClick={() => setConfirmDelete(a.id!)} className="w-6 h-6 flex items-center justify-center rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white transition-all">
+                             <Trash2 size={10} />
+                           </button>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  {a.notes && <p className="text-xs text-white/20 mt-2 border-t border-white/5 pt-2 truncate">{a.notes}</p>}
-                  {a.n8nTriggered && (
-                    <div className="flex items-center gap-1 mt-1">
-                      <Zap size={10} className="text-yellow-400" />
-                      <span className="text-[9px] text-yellow-400/60">n8n ativado</span>
+                ))}
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="glass rounded-2xl p-6 border border-white/5">
+            <h3 className="text-sm font-bold text-white/60 uppercase tracking-widest mb-4">Próximos</h3>
+            {upcomingAppts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-48 text-white/20">
+                <Calendar size={32} className="mb-3" />
+                <p className="text-xs">Nenhum agendamento futuro</p>
+              </div>
+            ) : (
+              <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
+                {upcomingAppts.map(a => (
+                  <div key={a.id} className="rounded-xl bg-white/5 p-3 hover:bg-white/10 transition-colors group">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-white truncate">{a.clientName}</p>
+                        <p className="text-xs text-white/40 mt-0.5">
+                          {new Date(a.appointmentDate + 'T12:00').toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })} às {a.appointmentTime}
+                        </p>
+                        <p className="text-xs text-white/30 mt-0.5">{a.serviceType}</p>
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border flex items-center gap-1 ${STATUS_CONFIG[a.status].cls}`}>
+                          {STATUS_CONFIG[a.status].label}
+                        </span>
+                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                          {a.status === 'agendado' && (
+                            <button onClick={() => handleStatusChange(a.id!, 'confirmado')} className="text-[9px] text-emerald-400 font-bold hover:text-emerald-300 transition-colors">Confirmar</button>
+                          )}
+                          {(a.status === 'agendado' || a.status === 'confirmado') && (
+                            <button onClick={() => handleStatusChange(a.id!, 'concluido')} className="text-[9px] text-teal-400 font-bold hover:text-teal-300 transition-colors ml-1">Concluir</button>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+                    {a.notes && <p className="text-xs text-white/20 mt-2 border-t border-white/5 pt-2 truncate">{a.notes}</p>}
+                    {a.n8nTriggered && (
+                      <div className="flex items-center gap-1 mt-1">
+                        <Zap size={10} className="text-yellow-400" />
+                        <span className="text-[9px] text-yellow-400/60">n8n ativado</span>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* New/Edit Modal */}

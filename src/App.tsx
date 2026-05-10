@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import {
   ShieldCheck,
   ArrowRight,
@@ -31,11 +32,63 @@ import logo from './logo_sem_fundo.png';
 import AdminLogin from './components/admin/AdminLogin';
 import AdminPanel from './components/admin/AdminPanel';
 
-type AppView = 'landing' | 'admin-login' | 'admin';
-
 export default function App() {
-  const [view, setView] = useState<AppView>('landing');
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+
+function AdminRoutes() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem('adminAuth') === 'true');
+  const navigate = useNavigate();
+
+  if (!isAuthenticated) {
+    return (
+      <Routes>
+        <Route path="login" element={
+          <div className="min-h-screen font-sans text-white selection:bg-gold/20">
+            <div className="fixed inset-0 pointer-events-none z-0">
+              <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gold/8 rounded-full blur-[180px]" />
+              <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gold-light/5 rounded-full blur-[150px]" />
+            </div>
+            <AdminLogin 
+              onLogin={() => {
+                sessionStorage.setItem('adminAuth', 'true');
+                setIsAuthenticated(true);
+                navigate('/admin/dashboard');
+              }} 
+              onBack={() => { window.location.href = '/'; }} 
+            />
+          </div>
+        } />
+        <Route path="*" element={<Navigate to="/admin/login" replace />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <div className="min-h-screen font-sans text-white selection:bg-gold/20">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gold/8 rounded-full blur-[180px]" />
+        <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gold-light/5 rounded-full blur-[150px]" />
+      </div>
+      <AdminPanel onLogout={() => {
+        sessionStorage.removeItem('adminAuth');
+        setIsAuthenticated(false);
+        navigate('/admin/login');
+      }} />
+    </div>
+  );
+}
+
+function LandingPage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const heroImages = [
@@ -55,30 +108,6 @@ export default function App() {
     }, 5000);
     return () => clearInterval(timer);
   }, [heroImages.length]);
-
-  if (view === 'admin-login') {
-    return (
-      <div className="min-h-screen font-sans text-white selection:bg-gold/20">
-        <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gold/8 rounded-full blur-[180px]" />
-          <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gold-light/5 rounded-full blur-[150px]" />
-        </div>
-        <AdminLogin onLogin={() => setView('admin')} onBack={() => setView('landing')} />
-      </div>
-    );
-  }
-
-  if (view === 'admin') {
-    return (
-      <div className="min-h-screen font-sans text-white selection:bg-gold/20">
-        <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gold/8 rounded-full blur-[180px]" />
-          <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gold-light/5 rounded-full blur-[150px]" />
-        </div>
-        <AdminPanel onLogout={() => setView('landing')} />
-      </div>
-    );
-  }
 
   // Landing Page
   return (
@@ -107,7 +136,7 @@ export default function App() {
             <a href="#servicos" className="text-xs font-bold uppercase tracking-widest text-white/60 hover:text-gold transition-colors">Serviços</a>
             <a href="#diferenciais" className="text-xs font-bold uppercase tracking-widest text-white/60 hover:text-gold transition-colors">Diferenciais</a>
             <button
-              onClick={() => setView('admin-login')}
+              onClick={() => navigate('/admin/dashboard')}
               className="px-8 py-3 glass-strong text-white rounded-full text-xs font-bold uppercase tracking-widest hover:bg-gold transition-all shadow-xl shadow-gold/10 active:scale-95 flex items-center gap-2"
             >
               <LayoutDashboard size={14} /> Painel Admin
@@ -132,7 +161,7 @@ export default function App() {
               <a href="#inicio" className="text-sm font-bold uppercase tracking-widest text-white" onClick={() => setIsMenuOpen(false)}>Início</a>
               <a href="#servicos" className="text-sm font-bold uppercase tracking-widest text-white" onClick={() => setIsMenuOpen(false)}>Serviços</a>
               <button
-                onClick={() => { setView('admin-login'); setIsMenuOpen(false); }}
+                onClick={() => { navigate('/admin/dashboard'); setIsMenuOpen(false); }}
                 className="w-full py-5 bg-gold text-white rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2"
               >
                 <LayoutDashboard size={16} /> Painel Admin
@@ -165,7 +194,7 @@ export default function App() {
               </p>
               <div className="flex flex-wrap gap-8 items-center">
                 <button
-                  onClick={() => setView('admin-login')}
+                  onClick={() => navigate('/admin/dashboard')}
                   className="h-18 px-12 bg-gold text-white rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-gold-light transition-all shadow-2xl shadow-gold/20 active:scale-95 group"
                 >
                   <LayoutDashboard size={18} />
@@ -372,7 +401,7 @@ export default function App() {
                 <li><a href="#servicos" className="text-lg font-serif hover:text-gold transition-colors">Serviços</a></li>
                 <li><a href="#diferenciais" className="text-lg font-serif hover:text-gold transition-colors">Diferenciais</a></li>
                 <li>
-                  <button onClick={() => setView('admin-login')} className="text-lg font-serif hover:text-gold transition-colors flex items-center gap-2">
+                  <button onClick={() => navigate('/admin/dashboard')} className="text-lg font-serif hover:text-gold transition-colors flex items-center gap-2">
                     <LayoutDashboard size={16} /> Painel Admin
                   </button>
                 </li>

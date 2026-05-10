@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate, Link } from 'react-router-dom';
 import { LayoutDashboard, FileText, Plus, CalendarDays, LogOut, Menu, X, AlertCircle } from 'lucide-react';
 import { getServiceOrders, getAppointments } from '../../lib/db';
 import type { ServiceOrder, Appointment } from '../../types';
@@ -8,7 +9,7 @@ import Scheduling from './Scheduling';
 import OSGenerator from '../OSGenerator';
 import logo from '../../logo_sem_fundo.png';
 
-type AdminTab = 'dashboard' | 'os-list' | 'os-generator' | 'scheduling';
+type AdminTab = 'dashboard' | 'ordens' | 'nova-os' | 'agendamentos';
 
 interface Props {
   onLogout: () => void;
@@ -16,13 +17,15 @@ interface Props {
 
 const NAV_ITEMS: { tab: AdminTab; icon: React.ReactNode; label: string }[] = [
   { tab: 'dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
-  { tab: 'os-list', icon: <FileText size={18} />, label: 'Ordens de Serviço' },
-  { tab: 'os-generator', icon: <Plus size={18} />, label: 'Nova OS' },
-  { tab: 'scheduling', icon: <CalendarDays size={18} />, label: 'Agendamentos' },
+  { tab: 'ordens', icon: <FileText size={18} />, label: 'Ordens de Serviço' },
+  { tab: 'nova-os', icon: <Plus size={18} />, label: 'Nova OS' },
+  { tab: 'agendamentos', icon: <CalendarDays size={18} />, label: 'Agendamentos' },
 ];
 
 export default function AdminPanel({ onLogout }: Props) {
-  const [tab, setTab] = useState<AdminTab>('dashboard');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const currentTab = location.pathname.split('/').pop() as AdminTab || 'dashboard';
   const [orders, setOrders] = useState<ServiceOrder[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -49,13 +52,13 @@ export default function AdminPanel({ onLogout }: Props) {
 
   const handleEditOS = (os: ServiceOrder) => {
     setEditOS(os);
-    setTab('os-generator');
+    navigate('/admin/nova-os');
     setSidebarOpen(false);
   };
 
   const handleNewOS = () => {
     setEditOS(undefined);
-    setTab('os-generator');
+    navigate('/admin/nova-os');
     setSidebarOpen(false);
   };
 
@@ -71,8 +74,8 @@ export default function AdminPanel({ onLogout }: Props) {
   };
 
   const switchTab = (t: AdminTab) => {
-    if (t !== 'os-generator') setEditOS(undefined);
-    setTab(t);
+    if (t !== 'nova-os') setEditOS(undefined);
+    navigate(`/admin/${t}`);
     setSidebarOpen(false);
   };
 
@@ -87,14 +90,18 @@ export default function AdminPanel({ onLogout }: Props) {
       </div>
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {NAV_ITEMS.map(({ tab: t, icon, label }) => (
-          <button
+          <Link
             key={t}
-            onClick={() => switchTab(t)}
+            to={`/admin/${t}`}
+            onClick={() => {
+              if (t !== 'nova-os') setEditOS(undefined);
+              setSidebarOpen(false);
+            }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all text-left
-              ${tab === t ? 'bg-gold text-white shadow-lg shadow-gold/20' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
+              ${currentTab === t ? 'bg-gold text-white shadow-lg shadow-gold/20' : 'text-white/50 hover:text-white hover:bg-white/5'}`}
           >
             {icon} {label}
-          </button>
+          </Link>
         ))}
       </nav>
       <div className="p-4 border-t border-white/10">
@@ -173,31 +180,28 @@ export default function AdminPanel({ onLogout }: Props) {
               </div>
             </div>
           ) : (
-            <>
-              {tab === 'dashboard' && (
-                <Dashboard orders={orders} appointments={appointments} onTabChange={switchTab} />
-              )}
-              {tab === 'os-list' && (
+            <Routes>
+              <Route path="dashboard" element={<Dashboard orders={orders} appointments={appointments} onTabChange={switchTab} />} />
+              <Route path="ordens" element={
                 <OSList
                   orders={orders}
                   onRefresh={loadData}
                   onNewOS={handleNewOS}
                   onEditOS={handleEditOS}
                 />
-              )}
-              {tab === 'os-generator' && (
+              } />
+              <Route path="nova-os" element={
                 <div className="p-4 sm:p-6">
                   <OSGenerator
                     editData={editOS}
                     onSaved={handleOSSaved}
-                    onBack={() => switchTab(editOS ? 'os-list' : 'dashboard')}
+                    onBack={() => switchTab(editOS ? 'ordens' : 'dashboard')}
                   />
                 </div>
-              )}
-              {tab === 'scheduling' && (
-                <Scheduling appointments={appointments} onRefresh={loadData} />
-              )}
-            </>
+              } />
+              <Route path="agendamentos" element={<Scheduling appointments={appointments} onRefresh={loadData} />} />
+              <Route path="*" element={<Navigate to="dashboard" replace />} />
+            </Routes>
           )}
         </div>
       </div>

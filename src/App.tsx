@@ -193,24 +193,15 @@ function LandingPage() {
                 Uma curadoria técnica em higienização e impermeabilização de estofados. Transformamos o cuidado em uma experiência única e bem-estar.
               </p>
               <div className="flex flex-wrap gap-8 items-center">
-                <button
-                  onClick={() => navigate('/admin/dashboard')}
-                  className="h-18 px-12 bg-gold text-white rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-gold-light transition-all shadow-2xl shadow-gold/20 active:scale-95 group"
-                >
-                  <LayoutDashboard size={18} />
-                  Acessar Painel
-                  <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                </button>
                 <a
-                  href="https://wa.me/5516920047362"
+                  href="https://wa.me/5516920647362"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 text-xs font-bold uppercase tracking-widest text-white/70 hover:text-gold transition-colors group"
+                  className="h-18 px-12 bg-gold text-white rounded-full font-bold uppercase tracking-widest text-xs flex items-center gap-4 hover:bg-gold-light transition-all shadow-2xl shadow-gold/20 active:scale-95 group"
                 >
-                  <div className="w-12 h-12 rounded-full border border-white/20 flex items-center justify-center group-hover:border-gold transition-colors">
-                    <MessageCircle size={20} />
-                  </div>
-                  Consultoria via WhatsApp
+                  <MessageCircle size={20} />
+                  <span>Consultoria via WhatsApp</span>
+                  <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                 </a>
               </div>
             </motion.div>

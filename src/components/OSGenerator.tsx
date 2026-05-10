@@ -91,7 +91,12 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
     });
   };
 
-  const clearSignatures = () => clientSigRef.current?.clear();
+  const handleClear = () => {
+    if (window.confirm('Tem certeza que deseja limpar todos os dados do formulário?')) {
+      setFormData(emptyForm());
+      clientSigRef.current?.clear();
+    }
+  };
 
   const handleSave = async () => {
     if (!formData.clientName) return alert('Preencha o nome do cliente.');
@@ -197,7 +202,7 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
               </span>
             )}
             <button
-              onClick={clearSignatures}
+              onClick={handleClear}
               className="flex items-center gap-2 px-4 py-2 glass border border-white/10 rounded-full text-white/60 hover:text-white hover:border-white/30 transition-all text-xs font-bold uppercase tracking-widest"
             >
               <Eraser size={14} /> Limpar

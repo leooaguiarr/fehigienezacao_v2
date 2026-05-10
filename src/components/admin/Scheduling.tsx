@@ -345,9 +345,9 @@ export default function Scheduling({ appointments, onRefresh }: Props) {
                   <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1.5">Tipo de Serviço</label>
                   <select value={form.serviceType} onChange={e => setForm(p => ({ ...p, serviceType: e.target.value as ServiceType }))}
                     className="w-full glass-strong border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white bg-slate-800 outline-none focus:border-gold transition-colors cursor-pointer">
-                    <option value="Higienização">Higienização Técnica</option>
-                    <option value="Impermeabilização">Impermeabilização</option>
-                    <option value="Ambos">Higienização + Impermeabilização</option>
+                    <option value="Higienização" className="bg-slate-800 text-white">Higienização Técnica</option>
+                    <option value="Impermeabilização" className="bg-slate-800 text-white">Impermeabilização</option>
+                    <option value="Ambos" className="bg-slate-800 text-white">Higienização + Impermeabilização</option>
                   </select>
                 </div>
                 {editAppt && (
@@ -355,10 +355,10 @@ export default function Scheduling({ appointments, onRefresh }: Props) {
                     <label className="block text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1.5">Status</label>
                     <select value={form.status} onChange={e => setForm(p => ({ ...p, status: e.target.value as AppointmentStatus }))}
                       className="w-full glass-strong border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white bg-slate-800 outline-none focus:border-gold transition-colors cursor-pointer">
-                      <option value="agendado">Agendado</option>
-                      <option value="confirmado">Confirmado</option>
-                      <option value="concluido">Concluído</option>
-                      <option value="cancelado">Cancelado</option>
+                      <option value="agendado" className="bg-slate-800 text-white">Agendado</option>
+                      <option value="confirmado" className="bg-slate-800 text-white">Confirmado</option>
+                      <option value="concluido" className="bg-slate-800 text-white">Concluído</option>
+                      <option value="cancelado" className="bg-slate-800 text-white">Cancelado</option>
                     </select>
                   </div>
                 )}

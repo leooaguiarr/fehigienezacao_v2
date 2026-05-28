@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=Dancing+Script:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700;1,900&family=Dancing+Script:wght@700&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-serif: "Playfair Display", serif;
-  --font-sans: "Inter", sans-serif;
+  --font-sans: "Montserrat", sans-serif;
   --font-signature: "Dancing Script", cursive;
 
   /* Glassmorphism Dark Palette */
@@ -12,6 +12,12 @@
   --color-gold-light: #22d3ee;
   --color-cool-grey: #080c18;
   --color-warm-grey: #101828;
+
+  /* Novas Cores da Identidade Visual */
+  --color-brand-blue: #237bb2;
+  --color-brand-blue-hover: #1b5e87;
+  --color-brand-green: #0f9c2e;
+  --color-brand-green-hover: #0c7e25;
   
   /* Override default oklch colors with hex for html2canvas compatibility */
   --color-slate-50: #f8fafc;
@@ -42,12 +48,11 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply font-sans text-white;
-    background: linear-gradient(160deg, #060a14 0%, #0a1225 35%, #0c1832 65%, #060a14 100%);
+    @apply font-sans text-slate-800 bg-slate-50;
     min-height: 100vh;
   }
   h1, h2, h3, h4 {
-    @apply font-serif;
+    @apply font-sans font-bold;
   }
 }
 

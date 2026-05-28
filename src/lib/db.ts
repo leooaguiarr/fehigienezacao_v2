@@ -113,3 +113,19 @@ export async function triggerN8nWebhook(appointment: Appointment): Promise<boole
     return false;
   }
 }
+
+// --- Contact Messages ---
+
+export async function saveContactMessage(message: {
+  name: string;
+  phone: string;
+  neighborhood: string;
+  message: string;
+}): Promise<string> {
+  const ref = await addDoc(collection(db, 'contact_messages'), {
+    ...message,
+    createdAt: Timestamp.now(),
+  });
+  return ref.id;
+}
+

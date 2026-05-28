@@ -40,18 +40,18 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
   const [formData, setFormData] = useState<Omit<ServiceOrder, 'id' | 'createdAt' | 'updatedAt'>>(
     editData
       ? {
-          clientName: editData.clientName,
-          phone: editData.phone,
-          date: editData.date,
-          serviceType: editData.serviceType,
-          fabrics: editData.fabrics,
-          dirtLevel: editData.dirtLevel,
-          conditions: editData.conditions,
-          dirtTypes: editData.dirtTypes,
-          observations: editData.observations,
-          price: editData.price,
-          status: editData.status,
-        }
+        clientName: editData.clientName,
+        phone: editData.phone,
+        date: editData.date,
+        serviceType: editData.serviceType,
+        fabrics: editData.fabrics,
+        dirtLevel: editData.dirtLevel,
+        conditions: editData.conditions,
+        dirtTypes: editData.dirtTypes,
+        observations: editData.observations,
+        price: editData.price,
+        status: editData.status,
+      }
       : emptyForm()
   );
 
@@ -152,7 +152,7 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
       const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
-      
+
       // Calcula a proporção para caber exatamente em 1 página
       const ratio = Math.min(pdfWidth / imgProps.width, pdfHeight / imgProps.height);
       const scaledWidth = imgProps.width * ratio;
@@ -160,7 +160,7 @@ export default function OSGenerator({ editData, onSaved, onBack, standalone }: P
 
       // Centraliza horizontalmente e alinha ao topo
       const x = (pdfWidth - scaledWidth) / 2;
-      
+
       pdf.addImage(imgData, 'PNG', x, 0, scaledWidth, scaledHeight);
       pdf.save(`OS_FE_Clean_${formData.clientName.replace(/\s+/g, '_') || 'Sem_Nome'}.pdf`);
     } catch (error) {

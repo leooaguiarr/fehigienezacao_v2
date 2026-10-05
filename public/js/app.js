@@ -41,7 +41,12 @@ const state = () => store.state;
 
 function getClient(id) { return state().clients.find(item => item.id === id); }
 function getService(id) { return state().services.find(item => item.id === id) || { id, name: 'Serviço desativado/removido', icon: 'sparkles', duration: 120, basePrice: 0, active: false }; }
-function clientName(client) { return client ? `${client.firstName} ${client.lastName}`.trim() : 'Cliente removido'; }
+function clientName(client) {
+  if (!client) return 'Cliente removido';
+  if (client.name && client.name.trim()) return client.name.trim();
+  const parts = [client.firstName, client.lastName].filter(Boolean);
+  return parts.length ? parts.join(' ') : 'Sem nome';
+}
 function clientStreet(client) { return client?.address || client?.street || client?.logradouro || ''; }
 function clientAddress(client) {
   if (!client) return 'Endereço não informado';
@@ -292,16 +297,21 @@ function renderMonth() {
 
 function renderClients() {
   const query = document.getElementById('clientSearch').value.trim().toLowerCase();
-  const filtered = state().clients.filter(client => `${clientName(client)} ${client.phone} ${client.neighborhood}`.toLowerCase().includes(query));
+  const filtered = state().clients.filter(client => `${clientName(client)} ${client.phone || ''} ${client.neighborhood || ''}`.toLowerCase().includes(query));
   const totalSpend = state().appointments.filter(item => item.status === 'completed').reduce((sum,item) => sum + Number(item.value),0);
   const due = state().clients.filter(client => client.nextRecommendation && client.nextRecommendation <= localISO(new Date())).length;
   document.getElementById('clientMetrics').innerHTML = `<div class="mini-metric"><strong>${state().clients.length}</strong><span>Clientes cadastrados</span></div><div class="mini-metric"><strong>${brl.format(totalSpend)}</strong><span>Valor histórico concluído</span></div><div class="mini-metric"><strong>${due}</strong><span>Contatos de recorrência</span></div>`;
   document.getElementById('clientGrid').innerHTML = filtered.length ? filtered.map(client => {
     const history = clientHistory(client.id), total = history.reduce((sum,item) => sum + Number(item.value),0), last = history[0];
-    const initials = `${client.firstName?.[0] || ''}${client.lastName?.[0] || ''}`.toUpperCase();
+    const initials = (
+      (client.firstName?.[0] || '') + (client.lastName?.[0] || '') ||
+      (client.name ? client.name.split(' ').map(n => n[0]).slice(0, 2).join('') : '') ||
+      'CL'
+    ).toUpperCase();
     const address = clientAddress(client);
-    return `<article class="client-card"><div class="client-head"><span class="initials">${esc(initials)}</span><div><h3>${esc(clientName(client))}</h3><span>${esc(client.phone)}</span></div></div><div class="client-stats"><div><strong>${history.length}</strong><span>serviços</span></div><div><strong>${brl.format(total)}</strong><span>total gasto</span></div><div><strong>${last?dateFmt.format(parseDate(last.date)):'-'}</strong><span>última higiene</span></div></div><p class="client-address"><i class="fa-solid fa-location-dot"></i> ${esc(address)}</p><div class="client-actions"><a target="_blank" rel="noopener noreferrer" href="https://wa.me/55${phoneDigits(client.phone)}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}"><i class="fa-solid fa-route"></i> Maps</a><button data-client-detail="${client.id}">Ver ficha</button></div></article>`;
+    return `<article class="client-card"><div class="client-head"><span class="initials">${esc(initials)}</span><div><h3>${esc(clientName(client))}</h3><span>${esc(client.phone || '')}</span></div></div><div class="client-stats"><div><strong>${history.length}</strong><span>serviços</span></div><div><strong>${brl.format(total)}</strong><span>total gasto</span></div><div><strong>${last?dateFmt.format(parseDate(last.date)):'-'}</strong><span>última higiene</span></div></div><p class="client-address"><i class="fa-solid fa-location-dot"></i> ${esc(address)}</p><div class="client-actions"><a target="_blank" rel="noopener noreferrer" href="https://wa.me/55${phoneDigits(client.phone || '')}"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a><a target="_blank" rel="noopener noreferrer" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}"><i class="fa-solid fa-route"></i> Maps</a><button data-client-detail="${client.id}">Ver ficha</button></div></article>`;
   }).join('') : empty('Nenhum cliente encontrado.');
+  bindDynamicActions();
 }
 
 function renderServices() {
@@ -503,12 +513,22 @@ function showClientDetail(id) {
   }
 
   const fullAddress = clientAddress(client);
-
   const bdayStr = client.birthDate ? `<div><span>Aniversário</span><strong>${dateFmt.format(parseDate(client.birthDate))}</strong></div>` : '<div><span>Aniversário</span><strong>Não informado</strong></div>';
+  const docLabel = (client.documentType || '').toLowerCase() === 'cnpj' ? 'CNPJ' : 'CPF';
+  const docValue = client.document ? (docLabel === 'CNPJ' ? maskCnpj(client.document) : maskCpf(client.document)) : 'Não informado';
+  const docStr = `<div><span>${docLabel}</span><strong>${esc(docValue)}</strong></div>`;
 
-  openDetail('FICHA DO CLIENTE', clientName(client), `<div class="detail-hero"><span class="initials">${esc((client.firstName?.[0]||'')+(client.lastName?.[0]||''))}</span><div><strong>${esc(clientName(client))}</strong><p>${esc(client.phone)}</p></div></div><div class="detail-grid"><div><span>Total gasto</span><strong>${brl.format(total)}</strong></div><div><span>Serviços concluídos</span><strong>${history.length}</strong></div><div><span>Última higienização</span><strong>${history[0]?dateFmt.format(parseDate(history[0].date)):'-'}</strong></div><div><span>Próxima recomendação</span><strong>${client.nextRecommendation?dateFmt.format(parseDate(client.nextRecommendation)):'Não definida'}</strong></div>${bdayStr}${docStr}<div style="grid-column:1/-1"><span>Endereço</span><strong>${esc(fullAddress)}</strong></div></div><h3>Histórico</h3><div class="stack-list" style="margin-top:10px">${history.length?history.map(item => `<div class="list-item"><span class="list-time">${dateFmt.format(parseDate(item.date))}</span><span class="list-main"><strong>${esc(getService(item.serviceId)?.name || '')}</strong><span>${esc(item.team || '')}</span></span><span class="list-value">${brl.format(item.value)}</span></div>`).join(''):empty('Ainda não há serviços concluídos.')}</div><div class="detail-actions">${whatsButton}<button type="button" class="secondary-button" data-edit-client="${client.id}"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" class="danger-button" data-delete-client="${client.id}"><i class="fa-solid fa-trash"></i> Excluir</button></div>`);
-  document.querySelector('[data-edit-client]').onclick = () => openForm('client', client.id);
-  document.querySelector('[data-delete-client]').onclick = () => excluirCliente(client.id);
+  const initials = (
+    (client.firstName?.[0] || '') + (client.lastName?.[0] || '') ||
+    (client.name ? client.name.split(' ').map(n => n[0]).slice(0, 2).join('') : '') ||
+    'CL'
+  ).toUpperCase();
+
+  openDetail('FICHA DO CLIENTE', clientName(client), `<div class="detail-hero"><span class="initials">${esc(initials)}</span><div><strong>${esc(clientName(client))}</strong><p>${esc(client.phone || 'Sem telefone')}</p></div></div><div class="detail-grid"><div><span>Total gasto</span><strong>${brl.format(total)}</strong></div><div><span>Serviços concluídos</span><strong>${history.length}</strong></div><div><span>Última higienização</span><strong>${history[0]?dateFmt.format(parseDate(history[0].date)):'-'}</strong></div><div><span>Próxima recomendação</span><strong>${client.nextRecommendation?dateFmt.format(parseDate(client.nextRecommendation)):'Não definida'}</strong></div>${bdayStr}${docStr}<div style="grid-column:1/-1"><span>Endereço</span><strong>${esc(fullAddress)}</strong></div></div><h3>Histórico</h3><div class="stack-list" style="margin-top:10px">${history.length?history.map(item => `<div class="list-item"><span class="list-time">${dateFmt.format(parseDate(item.date))}</span><span class="list-main"><strong>${esc(getService(item.serviceId)?.name || 'Serviço')}</strong><span>${esc(item.team || '')}</span></span><span class="list-value">${brl.format(item.value)}</span></div>`).join(''):empty('Ainda não há serviços concluídos.')}</div><div class="detail-actions">${whatsButton}<button type="button" class="secondary-button" data-edit-client="${client.id}"><i class="fa-solid fa-pen"></i> Editar</button><button type="button" class="danger-button" data-delete-client="${client.id}"><i class="fa-solid fa-trash"></i> Excluir</button></div>`);
+  const editBtn = document.querySelector('[data-edit-client]');
+  if (editBtn) editBtn.onclick = () => openForm('client', client.id);
+  const deleteBtn = document.querySelector('[data-delete-client]');
+  if (deleteBtn) deleteBtn.onclick = () => excluirCliente(client.id);
 }
 
 // Concluir um serviço move três registros de uma vez: o agendamento, a

@@ -4,8 +4,9 @@
 
 import { brl, dateFmt, fullDateFmt, monthFmt, localISO, parseDate, addDays, addMonths, startOfWeek, startOfMonth, uid, esc, phoneDigits, cap, whatsappLink, maskPhone, maskCep, maskCpf, maskCnpj, maskCurrency, parseCurrency } from './utils.js?v=2';
 import {
-  store, iniciar, entrarComSenha, entrarComGoogle, sair, irParaLogin,
-  criar, atualizar, remover, gravarLote, aoMudar, aoErro, mensagemErro
+  store, iniciar, entrarComGoogle, sair, irParaLogin,
+  criar, atualizar, remover, gravarLote, aoMudar, aoErro, mensagemErro,
+  listarAutorizados, adicionarAutorizado, removerAutorizado
 } from './store.js';
 import {
   suportaNotificacoes, permissaoAtual, pedirPermissao,
@@ -980,6 +981,9 @@ function navigate(view) {
     document.getElementById('eyebrow').textContent = titles[view][0];
     document.getElementById('pageTitle').textContent = titles[view][1];
   }
+  if (view === 'configuracoes') {
+    renderAuthorizedUsers();
+  }
   toggleSidebar(false);
   closeAlerts();
   closeModal();
@@ -1054,9 +1058,56 @@ function toggleProfile() {
 
 function mostrarAvisoAuth(mensagem, tom = 'erro') {
   const aviso = document.getElementById('authNotice');
+  if (!aviso) return;
   aviso.textContent = mensagem;
   aviso.hidden = !mensagem;
   aviso.className = `auth-notice ${tom}`;
+}
+
+async function renderAuthorizedUsers() {
+  const container = document.getElementById('authorizedUsersList');
+  if (!container) return;
+  container.innerHTML = '<div style="font-size:12px; color:var(--muted); padding:4px 0;"><i class="fa-solid fa-spinner fa-spin"></i> Carregando autorizados...</div>';
+  try {
+    const lista = await listarAutorizados();
+    if (!lista.length) {
+      container.innerHTML = '<div style="font-size:12px; color:var(--muted); padding:4px 0;">Nenhum usuário cadastrado.</div>';
+      return;
+    }
+    container.innerHTML = lista.map(item => `
+      <div style="display:flex; align-items:center; justify-content:space-between; padding:8px 12px; background:var(--surface); border:1px solid var(--line); border-radius:10px; gap:8px;">
+        <div style="display:flex; flex-direction:column; min-width:0;">
+          <strong style="font-size:13px; color:var(--ink); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(item.nome || item.email)}</strong>
+          <span style="font-size:11px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(item.email)}</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+          ${item.mestre ? '<span class="badge scheduled" style="font-size:10px;">Admin Mestre</span>' : `
+            <button type="button" class="icon-button" data-remove-authorized="${esc(item.email)}" title="Revogar acesso" style="width:28px; height:28px; color:var(--danger); border-radius:8px;">
+              <i class="fa-solid fa-trash-can" style="font-size:12px;"></i>
+            </button>
+          `}
+        </div>
+      </div>
+    `).join('');
+
+    container.querySelectorAll('[data-remove-authorized]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const emailRemover = btn.dataset.removeAuthorized;
+        if (confirm(`Revogar permissão de acesso para "${emailRemover}"?\n\nEsta conta não poderá mais entrar no painel.`)) {
+          try {
+            await removerAutorizado(emailRemover);
+            toast('Acesso revogado com sucesso.');
+            renderAuthorizedUsers();
+          } catch (err) {
+            alert(err.message || 'Erro ao revogar acesso.');
+          }
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Erro ao listar autorizados:', error);
+    container.innerHTML = '<div style="font-size:12px; color:var(--danger); padding:4px 0;"><i class="fa-solid fa-circle-exclamation"></i> Não foi possível carregar a lista.</div>';
+  }
 }
 
 async function handleGoogleLogin() {
@@ -1348,21 +1399,24 @@ async function confirmarSaida() {
 document.getElementById('signOut').addEventListener('click', confirmarSaida);
 document.getElementById('profileSignOut')?.addEventListener('click', confirmarSaida);
 document.getElementById('googleButton')?.addEventListener('click', handleGoogleLogin);
-document.getElementById('authPasswordForm')?.addEventListener('submit', async event => {
-  event.preventDefault();
-  const input = document.getElementById('authPasswordInput');
-  const error = document.getElementById('passwordError');
-  const ok = await entrarComSenha(input.value.trim());
-  if (ok) {
-    if (error) error.style.display = 'none';
-    toast('Acesso liberado com sucesso!');
-  } else {
-    if (error) error.style.display = 'block';
-    input.focus();
+document.getElementById('deniedSignOut')?.addEventListener('click', () => comFeedback(() => sair()));
+document.getElementById('btnAddAuthorized')?.addEventListener('click', async () => {
+  const email = prompt('Digite o e-mail Google da pessoa autorizada a acessar o painel:');
+  if (!email) return;
+  const emailLimpo = email.trim().toLowerCase();
+  if (!emailLimpo.includes('@') || !emailLimpo.includes('.')) {
+    alert('Por favor, informe um endereço de e-mail válido.');
+    return;
+  }
+  const nome = prompt('Nome ou identificação da pessoa (opcional):', '') || 'Membro da Equipe';
+  try {
+    await adicionarAutorizado(emailLimpo, nome);
+    toast(`E-mail ${emailLimpo} autorizado com sucesso!`);
+    renderAuthorizedUsers();
+  } catch (err) {
+    alert(err.message || 'Erro ao autorizar e-mail.');
   }
 });
-document.getElementById('deniedSignOut')?.addEventListener('click', () => comFeedback(() => sair()));
-document.getElementById('deniedDemo')?.addEventListener('click', async () => { await sair(); });
 
 document.querySelectorAll('[data-service-choice]').forEach(link => link.addEventListener('click', () => {
   const select = document.getElementById('landingServiceSelect');

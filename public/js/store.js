@@ -113,24 +113,15 @@ export function aoErro(callback) { notificarErro = callback; }
 
 // Observa o login e decide o modo de operação na abertura do app.
 export async function iniciar() {
-  // Limpeza de rastros de demonstração antigos
+  // Limpeza de rastros de demonstração antigos e autenticações legadas por senha
   try {
     localStorage.removeItem('feclean-gestao-v1');
     localStorage.removeItem('hiper-gestao-v1');
+    localStorage.removeItem('feclean-auth-team');
     if (localStorage.getItem(MODO_KEY) === 'demo') {
       localStorage.removeItem(MODO_KEY);
     }
   } catch {}
-
-  // Se já autenticado pela equipe via senha, entra direto em produção
-  if (localStorage.getItem('feclean-auth-team') === 'true') {
-    store.usuario = { displayName: 'Equipe F&E Clean', email: 'feclean.higienizacao@gmail.com' };
-    store.modo = 'nuvem';
-    localStorage.setItem(MODO_KEY, 'nuvem');
-    await escutarColecoes();
-    notificar();
-    return;
-  }
 
   const { auth, authApi } = await carregarSDK();
   authApi.onAuthStateChanged(auth, async usuario => {
@@ -140,6 +131,7 @@ export async function iniciar() {
       try {
         liberado = await verificarAutorizacao(usuario.email);
       } catch (error) {
+        console.error('Erro na validação de autorização:', error);
         notificarErro(mensagemErro(error));
       }
       if (!liberado) {
@@ -158,23 +150,10 @@ export async function iniciar() {
       store.usuario = null;
       store.modo = 'deslogado';
       store.state = estadoVazio();
+      localStorage.removeItem(MODO_KEY);
     }
     notificar();
   });
-}
-
-export async function entrarComSenha(senha) {
-  const senhaLimpa = String(senha || '').trim().toLowerCase();
-  if (['feclean2024', 'admin', 'feclean', '123456'].includes(senhaLimpa)) {
-    store.usuario = { displayName: 'Equipe F&E Clean', email: 'feclean.higienizacao@gmail.com' };
-    store.modo = 'nuvem';
-    localStorage.setItem(MODO_KEY, 'nuvem');
-    localStorage.setItem('feclean-auth-team', 'true');
-    await escutarColecoes();
-    notificar();
-    return true;
-  }
-  return false;
 }
 
 export async function entrarComGoogle() {
@@ -192,19 +171,84 @@ export async function entrarComGoogle() {
   }
 }
 
-// Autenticar não é o mesmo que ter acesso: a liberação vem da lista
-// autorizados/{email}, que o dono do projeto mantém.
+// Lista mestre com permissão irrestrita permanente
+const AUTORIZADOS_MESTRES = [
+  'feclean.higienizacao@gmail.com',
+  'leooaguiarr@gmail.com'
+];
+
+// Autenticar no Google não é o mesmo que ter acesso ao sistema:
+// a liberação vem exclusivamente da lista Firestore `autorizados/{email}`.
 async function verificarAutorizacao(email) {
-  const { db, dbApi } = await carregarSDK();
+  if (!email) return false;
+  const emailNorm = String(email).trim().toLowerCase();
+
+  // Contas mestre sempre autorizadas
+  if (AUTORIZADOS_MESTRES.includes(emailNorm)) return true;
+
   try {
-    const registro = await dbApi.getDoc(dbApi.doc(db, 'autorizados', email));
-    if (registro.exists()) return true;
-    // Se a coleção de autorizados não tiver restrições ou for conta da equipe:
-    if (email === 'feclean.higienizacao@gmail.com' || email === 'leooaguiarr@gmail.com') return true;
+    const { db, dbApi } = await carregarSDK();
+    const registro = await dbApi.getDoc(dbApi.doc(db, 'autorizados', emailNorm));
+    if (registro.exists()) {
+      const dados = registro.data() || {};
+      if (dados.ativo === false) return false;
+      return true;
+    }
     return false;
-  } catch {
-    return true;
+  } catch (err) {
+    console.warn('Erro ao consultar lista de autorizados no Firestore:', err);
+    return false;
   }
+}
+
+export async function listarAutorizados() {
+  const { db, dbApi } = await carregarSDK();
+  const snapshot = await dbApi.getDocs(dbApi.collection(db, 'autorizados'));
+  const mapa = new Map();
+
+  // Inclui as contas mestres por padrão
+  AUTORIZADOS_MESTRES.forEach(email => {
+    mapa.set(email, { email, nome: 'Administrador Principal', ativo: true, mestre: true });
+  });
+
+  snapshot.forEach(docSnap => {
+    const data = docSnap.data() || {};
+    const email = docSnap.id.toLowerCase();
+    mapa.set(email, {
+      email,
+      nome: data.nome || 'Membro da Equipe',
+      ativo: data.ativo !== false,
+      mestre: AUTORIZADOS_MESTRES.includes(email),
+      ...data
+    });
+  });
+
+  return Array.from(mapa.values());
+}
+
+export async function adicionarAutorizado(email, nome = '') {
+  if (!email) throw new Error('E-mail é obrigatório.');
+  const emailNorm = String(email).trim().toLowerCase();
+  if (!emailNorm.includes('@') || !emailNorm.includes('.')) {
+    throw new Error('E-mail inválido.');
+  }
+  const { db, dbApi } = await carregarSDK();
+  await dbApi.setDoc(dbApi.doc(db, 'autorizados', emailNorm), {
+    email: emailNorm,
+    nome: nome.trim() || 'Membro da Equipe',
+    ativo: true,
+    cadastradoEm: new Date().toISOString()
+  }, { merge: true });
+}
+
+export async function removerAutorizado(email) {
+  if (!email) return;
+  const emailNorm = String(email).trim().toLowerCase();
+  if (AUTORIZADOS_MESTRES.includes(emailNorm)) {
+    throw new Error('Não é possível remover a conta de administrador mestre.');
+  }
+  const { db, dbApi } = await carregarSDK();
+  await dbApi.deleteDoc(dbApi.doc(db, 'autorizados', emailNorm));
 }
 
 export async function sair() {

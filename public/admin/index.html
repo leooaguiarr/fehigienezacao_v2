@@ -75,31 +75,21 @@
             <img src="/assets/logo-feclean.png" alt="Logo F&E Clean" style="background:#fff; border-radius:14px; padding:3px; border:1px solid var(--line);">
             <div><strong>F&E Clean</strong><span>Painel de Gestão</span></div>
           </div>
-          <span class="auth-eyebrow">Área exclusiva da equipe</span>
+          <span class="auth-eyebrow">Área restrita da equipe</span>
           <h1 id="authTitle">Acesse a gestão</h1>
-          <p id="authText">Digite a senha da equipe ou entre com sua conta autorizada.</p>
+          <p id="authText">Acesso exclusivo para contas Google autorizadas da equipe F&amp;E Clean.</p>
+          <div class="auth-notice" id="authNotice" hidden></div>
 
-          <!-- Formulário com Senha Direta da Equipe -->
-          <form id="authPasswordForm" class="auth-password-box">
-            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:6px;">
-              Senha da Equipe
-            </label>
-            <div style="display:flex; gap:8px;">
-              <input type="password" id="authPasswordInput" placeholder="Digite a senha..." style="flex:1; padding:11px 14px; border:1px solid var(--line); border-radius:12px; font-size:14px; background:#fff; color:var(--ink); outline:none;" required>
-              <button type="submit" class="primary-button" style="white-space:nowrap; padding:0 22px; background:var(--blue); border-color:var(--blue);">Entrar</button>
-            </div>
-            <p id="passwordError" style="color:var(--danger); font-size:12px; margin-top:6px; font-weight:600; display:none;"><i class="fa-solid fa-circle-exclamation"></i> Senha incorreta. Tente novamente.</p>
-          </form>
-
-          <div style="display:flex; align-items:center; gap:12px; margin: 18px 0; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:0.1em;">
-            <div style="flex:1; height:1px; background:var(--line);"></div>ou<div style="flex:1; height:1px; background:var(--line);"></div>
-          </div>
-
-          <div id="authEntrar">
+          <div id="authEntrar" style="margin-top:20px;">
             <button type="button" class="google-button" id="googleButton">
               <svg viewBox="0 0 18 18" aria-hidden="true" focusable="false"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
               Continuar com Google
             </button>
+          </div>
+
+          <div style="margin-top:16px; padding:12px 14px; background:rgba(37,99,235,0.06); border:1px solid rgba(37,99,235,0.15); border-radius:12px; font-size:12px; color:var(--ink-secondary); display:flex; align-items:center; gap:10px; text-align:left;">
+            <i class="fa-solid fa-shield-halved" style="color:var(--blue); font-size:16px; flex-shrink:0;"></i>
+            <span>Ambiente seguro. Apenas contas Google autorizadas pela F&amp;E Clean têm acesso.</span>
           </div>
 
           <div style="margin-top:22px; text-align:center;">
@@ -111,16 +101,22 @@
 
         <div class="auth-box" id="deniedBox" hidden>
           <div class="auth-brand">
-            <img src="/assets/logo-feclean.png" alt="Logo F&E Clean">
-            <div><strong>F&E Clean</strong><span>Higienização</span></div>
+            <img src="/assets/logo-feclean.png" alt="Logo F&E Clean" style="background:#fff; border-radius:14px; padding:3px; border:1px solid var(--line);">
+            <div><strong>F&E Clean</strong><span>Painel de Gestão</span></div>
           </div>
           <div class="denied-icon"><i class="fa-solid fa-lock"></i></div>
           <h1>Acesso não liberado</h1>
-          <p>A conta <strong id="deniedEmail">-</strong> não está autorizada a acessar os dados da F&E Clean.</p>
-          <p class="muted">Para liberar, solicite o acesso ao administrador ou entre com a senha da equipe.</p>
-          <div class="settings-actions">
-            <button type="button" class="secondary-button" id="deniedSignOut"><i class="fa-solid fa-right-from-bracket"></i> Tentar outra conta</button>
-            <button type="button" class="primary-button" id="deniedDemo"><i class="fa-solid fa-key"></i> Entrar com senha da equipe</button>
+          <p>A conta Google <strong id="deniedEmail">-</strong> não está na lista de pessoas autorizadas da F&amp;E Clean.</p>
+          <p class="muted" style="margin-top:8px;">Se você faz parte da equipe, solicite ao administrador a liberação do seu e-mail.</p>
+          <div class="settings-actions" style="margin-top:20px; justify-content:center;">
+            <button type="button" class="primary-button" id="deniedSignOut" style="width:100%; justify-content:center;">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> Trocar conta Google
+            </button>
+          </div>
+          <div style="margin-top:18px; text-align:center;">
+            <a href="/" style="color:var(--muted); font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-arrow-left"></i> Voltar ao site principal
+            </a>
           </div>
         </div>
 
@@ -318,7 +314,27 @@
             <article class="panel" id="notifyPanel"><div class="panel-heading"><div><span class="overline">LEMBRETES</span><h3>Agenda e horários</h3></div></div><p class="muted">Mostra o resumo do dia e avisa 30 minutos antes de atendimentos e devoluções.</p><div class="auth-notice aviso" id="notifyDeniedAlert" hidden><i class="fa-solid fa-triangle-exclamation"></i><span>Lembretes bloqueados no aparelho. Para reativar, abra os Ajustes e ative Notificações.</span></div><div class="settings-actions"><button type="button" class="primary-button" id="notifyButton"><i class="fa-regular fa-bell"></i> Ativar lembretes</button><button type="button" class="secondary-button" id="notifyTest" hidden><i class="fa-solid fa-vial"></i> Testar agora</button></div><dl class="data-list"><div><dt>Permissão</dt><dd id="notifyStatus">-</dd></div><div><dt>Em segundo plano</dt><dd id="notifyBackground">-</dd></div></dl></article>
             <article class="panel" id="appPanel"><div class="panel-heading"><div><span class="overline">APLICATIVO</span><h3>Instalar no celular</h3></div></div><p class="muted" id="installText">Instale a F&E Clean no celular da equipe para abrir em tela cheia, com ícone próprio, e continuar funcionando sem sinal na casa do cliente.</p><div class="settings-actions"><button type="button" class="primary-button" id="installButton" hidden><i class="fa-solid fa-download"></i> Instalar aplicativo</button><button type="button" class="secondary-button" id="reloadAppButton"><i class="fa-solid fa-arrows-rotate"></i> Atualizar aplicativo</button></div><dl class="data-list"><div><dt>Instalação</dt><dd id="installStatus">-</dd></div><div><dt>Uso offline</dt><dd id="offlineStatus">-</dd></div></dl></article>
 
-            <article class="panel" id="cloudPanel"><div class="panel-heading"><div><span class="overline">ACESSO</span><h3>Gestão da Equipe</h3></div></div><p class="muted">Acesso sincronizado em tempo real entre os aparelhos e computadores da equipe F&E Clean.</p><dl class="data-list"><div><dt>Nome</dt><dd id="accountName">Equipe F&E Clean</dd></div><div><dt>Status</dt><dd id="accountEmail">Acesso Ativo</dd></div></dl><div class="settings-actions"><a class="secondary-button" href="/" target="_blank"><i class="fa-solid fa-globe"></i> Ver site</a><button type="button" class="danger-button" id="signOut"><i class="fa-solid fa-right-from-bracket"></i> Sair do painel</button></div></article>
+            <article class="panel" id="cloudPanel">
+              <div class="panel-heading"><div><span class="overline">ACESSO</span><h3>Gestão da Equipe</h3></div></div>
+              <p class="muted">Acesso restrito exclusivamente a contas Google autorizadas com sincronização em tempo real.</p>
+              <dl class="data-list">
+                <div><dt>Usuário conectado</dt><dd id="accountName">Equipe F&amp;E Clean</dd></div>
+                <div><dt>E-mail Google</dt><dd id="accountEmail">-</dd></div>
+              </dl>
+              <div style="margin-top:16px; border-top:1px solid var(--line); padding-top:14px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; gap:8px;">
+                  <strong style="font-size:13px; color:var(--ink);"><i class="fa-solid fa-shield-halved" style="color:var(--blue); margin-right:6px;"></i>Contas Google Autorizadas</strong>
+                  <button type="button" class="secondary-button" id="btnAddAuthorized" style="padding:6px 12px; font-size:12px;">
+                    <i class="fa-solid fa-user-plus"></i> Autorizar e-mail
+                  </button>
+                </div>
+                <div id="authorizedUsersList" style="display:flex; flex-direction:column; gap:6px; font-size:12px;"></div>
+              </div>
+              <div class="settings-actions" style="margin-top:18px;">
+                <a class="secondary-button" href="/" target="_blank"><i class="fa-solid fa-globe"></i> Ver site</a>
+                <button type="button" class="danger-button" id="signOut"><i class="fa-solid fa-right-from-bracket"></i> Sair do painel</button>
+              </div>
+            </article>
           </div>
         </section>
       </main>

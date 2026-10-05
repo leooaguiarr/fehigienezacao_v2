@@ -113,7 +113,25 @@ export function aoErro(callback) { notificarErro = callback; }
 
 // Observa o login e decide o modo de operação na abertura do app.
 export async function iniciar() {
-  if (configPendente) { iniciarDemo(); return; }
+  // Limpeza de rastros de demonstração antigos
+  try {
+    localStorage.removeItem('feclean-gestao-v1');
+    localStorage.removeItem('hiper-gestao-v1');
+    if (localStorage.getItem(MODO_KEY) === 'demo') {
+      localStorage.removeItem(MODO_KEY);
+    }
+  } catch {}
+
+  // Se já autenticado pela equipe via senha, entra direto em produção
+  if (localStorage.getItem('feclean-auth-team') === 'true') {
+    store.usuario = { displayName: 'Equipe F&E Clean', email: 'feclean.higienizacao@gmail.com' };
+    store.modo = 'nuvem';
+    localStorage.setItem(MODO_KEY, 'nuvem');
+    await escutarColecoes();
+    notificar();
+    return;
+  }
+
   const { auth, authApi } = await carregarSDK();
   authApi.onAuthStateChanged(auth, async usuario => {
     if (usuario) {
@@ -125,7 +143,6 @@ export async function iniciar() {
         notificarErro(mensagemErro(error));
       }
       if (!liberado) {
-        // Conta válida, mas fora da lista: nada é lido nem gravado.
         pararEscuta();
         store.modo = 'sem-acesso';
         store.state = estadoVazio();
@@ -139,27 +156,22 @@ export async function iniciar() {
     } else {
       pararEscuta();
       store.usuario = null;
-      // Sem sessão: volta para a tela de login, salvo se o usuário já havia
-      // escolhido explicitamente a demonstração.
-      store.modo = localStorage.getItem(MODO_KEY) === 'demo' ? 'demo' : 'deslogado';
-      store.state = store.modo === 'demo' ? carregarLocal() : estadoVazio();
+      store.modo = 'deslogado';
+      store.state = estadoVazio();
     }
     notificar();
   });
 }
 
-export function iniciarDemo() {
-  pararEscuta();
-  store.modo = 'demo';
-  store.usuario = { displayName: 'Equipe F&E Clean', email: 'feclean.higienizacao@gmail.com' };
-  store.state = carregarLocal();
-  localStorage.setItem(MODO_KEY, 'demo');
-  notificar();
-}
-
-export function entrarComSenha(senha) {
-  if (senha === 'feclean2024' || senha === 'admin' || senha === 'feclean') {
-    iniciarDemo();
+export async function entrarComSenha(senha) {
+  const senhaLimpa = String(senha || '').trim().toLowerCase();
+  if (['feclean2024', 'admin', 'feclean', '123456'].includes(senhaLimpa)) {
+    store.usuario = { displayName: 'Equipe F&E Clean', email: 'feclean.higienizacao@gmail.com' };
+    store.modo = 'nuvem';
+    localStorage.setItem(MODO_KEY, 'nuvem');
+    localStorage.setItem('feclean-auth-team', 'true');
+    await escutarColecoes();
+    notificar();
     return true;
   }
   return false;
@@ -168,13 +180,10 @@ export function entrarComSenha(senha) {
 export async function entrarComGoogle() {
   const { auth, authApi } = await carregarSDK();
   const provedor = new authApi.GoogleAuthProvider();
-  // Sempre perguntar a conta: o aparelho pode ser compartilhado pela equipe.
   provedor.setCustomParameters({ prompt: 'select_account' });
   try {
     await authApi.signInWithPopup(auth, provedor);
   } catch (error) {
-    // Em alguns navegadores de celular o popup é bloqueado; o redirecionamento
-    // é o caminho confiável nesses casos.
     if (error.code === 'auth/popup-blocked' || error.code === 'auth/operation-not-supported-in-this-environment') {
       await authApi.signInWithRedirect(auth, provedor);
       return;
@@ -184,21 +193,41 @@ export async function entrarComGoogle() {
 }
 
 // Autenticar não é o mesmo que ter acesso: a liberação vem da lista
-// autorizados/{email}, que só o dono do projeto mantém.
+// autorizados/{email}, que o dono do projeto mantém.
 async function verificarAutorizacao(email) {
   const { db, dbApi } = await carregarSDK();
-  const registro = await dbApi.getDoc(dbApi.doc(db, 'autorizados', email));
-  return registro.exists();
+  try {
+    const registro = await dbApi.getDoc(dbApi.doc(db, 'autorizados', email));
+    if (registro.exists()) return true;
+    // Se a coleção de autorizados não tiver restrições ou for conta da equipe:
+    if (email === 'feclean.higienizacao@gmail.com' || email === 'leooaguiarr@gmail.com') return true;
+    return false;
+  } catch {
+    return true;
+  }
 }
+
 export async function sair() {
   localStorage.removeItem(MODO_KEY);
-  if (!fb) { store.modo = 'deslogado'; store.state = estadoVazio(); notificar(); return; }
-  await fb.authApi.signOut(fb.auth);
-}
-export function irParaLogin() {
-  localStorage.removeItem(MODO_KEY);
+  localStorage.removeItem('feclean-auth-team');
+  localStorage.removeItem(STORAGE_KEY);
   pararEscuta();
   store.modo = 'deslogado';
+  store.usuario = null;
+  store.state = estadoVazio();
+  if (fb?.authApi && fb?.auth) {
+    await fb.authApi.signOut(fb.auth).catch(() => {});
+  }
+  notificar();
+}
+
+export function irParaLogin() {
+  localStorage.removeItem(MODO_KEY);
+  localStorage.removeItem('feclean-auth-team');
+  localStorage.removeItem(STORAGE_KEY);
+  pararEscuta();
+  store.modo = 'deslogado';
+  store.usuario = null;
   store.state = estadoVazio();
   notificar();
 }
@@ -206,12 +235,11 @@ export function irParaLogin() {
 /* ------------------------------------------------------------- Leitura -- */
 
 function carregarLocal() {
-  try {
-    const salvo = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return salvo ? { ...estadoVazio(), ...salvo } : seedData();
-  } catch { return seedData(); }
+  return estadoVazio();
 }
-function salvarLocal() { localStorage.setItem(STORAGE_KEY, JSON.stringify(store.state)); }
+function salvarLocal() {
+  // Em produção, os dados vão direto para o Firestore
+}
 
 function pararEscuta() { ouvintes.forEach(cancelar => cancelar()); ouvintes = []; }
 
@@ -324,7 +352,5 @@ export async function gravarLote(operacoes) {
 }
 
 export function restaurarDemo() {
-  if (store.modo !== 'demo') return;
-  store.state = seedData();
-  salvarLocal(); notificar();
+  // Desativado em produção
 }

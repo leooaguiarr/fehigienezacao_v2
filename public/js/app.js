@@ -4,8 +4,8 @@
 
 import { brl, dateFmt, fullDateFmt, monthFmt, localISO, parseDate, addDays, addMonths, startOfWeek, startOfMonth, uid, esc, phoneDigits, cap, whatsappLink, maskPhone, maskCep, maskCpf, maskCnpj, maskCurrency, parseCurrency } from './utils.js?v=2';
 import {
-  store, iniciar, iniciarDemo, entrarComSenha, entrarComGoogle, sair, irParaLogin,
-  criar, atualizar, remover, gravarLote, restaurarDemo, aoMudar, aoErro, mensagemErro
+  store, iniciar, entrarComSenha, entrarComGoogle, sair, irParaLogin,
+  criar, atualizar, remover, gravarLote, aoMudar, aoErro, mensagemErro
 } from './store.js';
 import {
   suportaNotificacoes, permissaoAtual, pedirPermissao,
@@ -1348,15 +1348,12 @@ async function confirmarSaida() {
 document.getElementById('signOut').addEventListener('click', confirmarSaida);
 document.getElementById('profileSignOut')?.addEventListener('click', confirmarSaida);
 document.getElementById('googleButton')?.addEventListener('click', handleGoogleLogin);
-document.getElementById('demoButton')?.addEventListener('click', () => {
-  iniciarDemo();
-  toast('Modo demonstração ativado!');
-});
-document.getElementById('authPasswordForm')?.addEventListener('submit', event => {
+document.getElementById('authPasswordForm')?.addEventListener('submit', async event => {
   event.preventDefault();
   const input = document.getElementById('authPasswordInput');
   const error = document.getElementById('passwordError');
-  if (entrarComSenha(input.value.trim())) {
+  const ok = await entrarComSenha(input.value.trim());
+  if (ok) {
     if (error) error.style.display = 'none';
     toast('Acesso liberado com sucesso!');
   } else {
@@ -1365,7 +1362,7 @@ document.getElementById('authPasswordForm')?.addEventListener('submit', event =>
   }
 });
 document.getElementById('deniedSignOut')?.addEventListener('click', () => comFeedback(() => sair()));
-document.getElementById('deniedDemo')?.addEventListener('click', async () => { await sair(); iniciarDemo(); });
+document.getElementById('deniedDemo')?.addEventListener('click', async () => { await sair(); });
 
 document.querySelectorAll('[data-service-choice]').forEach(link => link.addEventListener('click', () => {
   const select = document.getElementById('landingServiceSelect');

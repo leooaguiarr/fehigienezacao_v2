@@ -36,6 +36,7 @@ import resultadoNovo1 from './resultado_novo_1.png';
 import resultadoNovo2 from './resultado_novo_2.png';
 import resultadoColchaoClean from './resultado_colchao_clean.png';
 import fundoSite from './fundo_site.png';
+import fundoVideo from './Cinematic_background_video_for.mp4';
 import logo from './logo_sem_fundo.png';
 
 import AdminLogin from './components/admin/AdminLogin';
@@ -47,10 +48,18 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
-        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/admin" element={<AdminRedirect />} />
+        <Route path="/admin/*" element={<AdminRedirect />} />
       </Routes>
     </BrowserRouter>
   );
+}
+
+function AdminRedirect() {
+  React.useEffect(() => {
+    window.location.replace('/admin/index.html');
+  }, []);
+  return null;
 }
 
 function AdminRoutes() {
@@ -208,28 +217,28 @@ function LandingPage() {
   const testimonials = [
     {
       name: "monalisa pereira",
-      date: "2022-08-08",
+      date: "2026-05-10",
       text: "Atendimento muito boa,excelente empresa.gostei muito da limpeza,fiz uma cama e o meu estofado, ficou muito bom o cheiro muito",
       initials: "M",
       avatarBg: "bg-pink-600"
     },
     {
       name: "Cynthia Pereira",
-      date: "2022-07-11",
+      date: "2026-02-14",
       text: "Atendimento top, prestadores educados e serviço de qualidade fora o preço . Se preocupam com os clientes e são organizados ✅",
       initials: "C",
       avatarBg: "bg-blue-600"
     },
     {
       name: "Joyce Lopes",
-      date: "2022-07-03",
+      date: "2025-11-20",
       text: "Os melhores no que faz, super indico, agilidade, excelência, fora o cheiroooo que ficou exalando por toda casa!!",
       initials: "J",
       avatarBg: "bg-teal-600"
     },
     {
       name: "Ruth Cardoso Rodrigues",
-      date: "2021-11-27",
+      date: "2025-08-05",
       text: "Amei o resultados das cadeiras e sofá, fora que o técnico super simpático explicou tudo que seria feito, George muito obrigado.",
       initials: "R",
       avatarBg: "bg-purple-600"
@@ -237,10 +246,19 @@ function LandingPage() {
   ];
 
   return (
-    <div 
-      className="min-h-screen font-sans text-slate-800 selection:bg-brand-blue/20 bg-fixed bg-cover bg-center bg-no-repeat"
-      style={{ backgroundImage: `url(${fundoSite})` }}
-    >
+    <div className="min-h-screen font-sans text-slate-800 selection:bg-brand-blue/20 relative">
+      {/* Fixed Background Video */}
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        className="fixed inset-0 w-full h-full object-cover -z-10 contrast-[1.15] saturate-[1.5] brightness-95"
+      >
+        <source src={fundoVideo} type="video/mp4" />
+      </video>
+      {/* Dark Overlay for better text readability */}
+      <div className="fixed inset-0 bg-black/55 backdrop-blur-[1px] -z-10" />
       {/* ─── Navbar ─── */}
       <nav className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -271,12 +289,12 @@ function LandingPage() {
               <WhatsAppIcon size={14} />
               Orçamento
             </a>
-            <button
-              onClick={() => navigate('/admin/dashboard')}
+            <a
+              href="/admin/"
               className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
             >
               <LayoutDashboard size={14} className="text-slate-500" /> Admin
-            </button>
+            </a>
           </div>
 
           {/* Mobile Toggle */}
@@ -303,12 +321,13 @@ function LandingPage() {
             >
               <WhatsAppIcon size={16} /> Solicitar Orçamento
             </a>
-            <button
-              onClick={() => { navigate('/admin/dashboard'); setIsMenuOpen(false); }}
+            <a
+              href="/admin/"
               className="w-full py-4 bg-slate-100 text-slate-700 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
+              onClick={() => setIsMenuOpen(false)}
             >
               <LayoutDashboard size={16} /> Painel Admin
-            </button>
+            </a>
           </div>
         )}
       </nav>
@@ -321,13 +340,13 @@ function LandingPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-blue/10 border border-brand-blue/20 mb-6">
-              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-blue">Ribeirão Preto e Região</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/20 mb-6">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-200">Ribeirão Preto e Região</span>
             </div>
-            <h1 className="text-4xl md:text-6xl font-sans font-black tracking-tight mb-6 leading-tight text-slate-900">
-              O QUE VOCÊ <span className="text-brand-blue italic">PRECISA?</span>
+            <h1 className="text-4xl md:text-6xl font-sans font-black tracking-tight mb-6 leading-tight text-white">
+              O QUE VOCÊ <span className="text-blue-300 italic">PRECISA?</span>
             </h1>
-            <p className="text-slate-500 max-w-2xl mx-auto text-base md:text-lg leading-relaxed">
+            <p className="text-slate-200 max-w-2xl mx-auto text-base md:text-lg leading-relaxed font-medium">
               Utilizamos produtos e equipamentos especializados. Nossa equipe promove uma limpeza profunda,
               deixando o acabamento totalmente limpo, com cheiro agradável e livre de fungos, bactérias e ácaros.
             </p>

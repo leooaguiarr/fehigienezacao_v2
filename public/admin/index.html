@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#237bb2">
+  <meta name="description" content="Acesso ao sistema de gestão operacional da F&E Clean.">
+  <meta name="robots" content="noindex, nofollow">
+  <title>F&E Clean | Sistema de Gestão</title>
+  <link rel="canonical" href="/admin/">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="F&E Clean | Sistema de Gestão">
+  <meta property="og:description" content="Área de controle e gestão da equipe F&E Clean.">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/assets/logo-feclean.png" type="image/png" sizes="192x192">
+  <link rel="apple-touch-icon" href="/assets/logo-feclean.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="F&E Clean">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <script src="/js/html-to-image.js"></script>
+  <script src="/js/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <link rel="stylesheet" href="/css/app.css?v=32">
+  <style>
+    /* Estilos adicionais específicos para login com senha e botão voltar */
+    .sidebar-site-link:hover {
+      background: rgba(35, 123, 178, 0.15) !important;
+    }
+    .auth-password-box {
+      margin-top: 18px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <!-- Tela de Login / Autenticação -->
+  <div class="auth-screen" id="authScreen" hidden>
+    <section class="auth-visual" aria-label="F&E Clean — cuidado profissional para estofados">
+      <div class="auth-visual-brand">
+        <img src="/assets/logo-feclean.png" alt="F&E Clean" style="background:#fff; border-radius:14px; padding:4px;">
+        <span><strong>F&E Clean</strong><small>Higienização de Estofados</small></span>
+      </div>
+      <div class="auth-visual-copy">
+        <span class="auth-visual-kicker"><i class="fa-solid fa-sparkles"></i> Excelência em cada detalhe</span>
+        <h1>Cuidado que renova.<br><em>Gestão que transforma.</em></h1>
+        <p>Tecnologia, agilidade e organização para manter cada atendimento no padrão F&E Clean.</p>
+      </div>
+      <div class="auth-visual-meta">
+        <span><i class="fa-solid fa-couch"></i> Higienização</span>
+        <span><i class="fa-solid fa-shield-halved"></i> Impermeabilização</span>
+        <span><i class="fa-solid fa-car"></i> Automotivo</span>
+      </div>
+    </section>
+
+    <section class="auth-panel" aria-label="Acesso da equipe">
+      <div class="auth-panel-glow" aria-hidden="true"></div>
+      <div class="auth-panel-inner">
+        <div class="auth-mobile-brand">
+          <img src="/assets/logo-feclean.png" alt="F&E Clean" style="background:#fff; border-radius:12px; padding:2px;">
+          <span><strong>F&E Clean</strong><small>Higienização de Estofados</small></span>
+        </div>
+        <div class="auth-loading" id="authLoading"><i class="fa-solid fa-spinner fa-spin"></i><span>Verificando acesso...</span></div>
+        <div class="auth-box" id="authBox" hidden>
+          <div class="auth-brand">
+            <img src="/assets/logo-feclean.png" alt="Logo F&E Clean" style="background:#fff; border-radius:14px; padding:3px; border:1px solid var(--line);">
+            <div><strong>F&E Clean</strong><span>Painel de Gestão</span></div>
+          </div>
+          <span class="auth-eyebrow">Área exclusiva da equipe</span>
+          <h1 id="authTitle">Acesse a gestão</h1>
+          <p id="authText">Digite a senha da equipe ou entre com sua conta autorizada.</p>
+
+          <div class="auth-notice aviso" id="configWarning" hidden>
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span>Firebase em modo local. Você pode entrar diretamente com a senha da equipe ou modo demonstração.</span>
+          </div>
+
+          <p class="auth-notice" id="authNotice" hidden></p>
+
+          <!-- Formulário com Senha Direta da Equipe -->
+          <form id="authPasswordForm" class="auth-password-box">
+            <label style="display:block; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:6px;">
+              Senha da Equipe
+            </label>
+            <div style="display:flex; gap:8px;">
+              <input type="password" id="authPasswordInput" placeholder="Digite a senha..." style="flex:1; padding:11px 14px; border:1px solid var(--line); border-radius:12px; font-size:14px; background:#fff; color:var(--ink); outline:none;" required>
+              <button type="submit" class="primary-button" style="white-space:nowrap; padding:0 22px; background:var(--blue); border-color:var(--blue);">Entrar</button>
+            </div>
+            <p id="passwordError" style="color:var(--danger); font-size:12px; margin-top:6px; font-weight:600; display:none;"><i class="fa-solid fa-circle-exclamation"></i> Senha incorreta. Tente novamente.</p>
+          </form>
+
+          <div style="display:flex; align-items:center; gap:12px; margin: 18px 0; color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:0.1em;">
+            <div style="flex:1; height:1px; background:var(--line);"></div>ou<div style="flex:1; height:1px; background:var(--line);"></div>
+          </div>
+
+          <div id="authEntrar">
+            <button type="button" class="google-button" id="googleButton">
+              <svg viewBox="0 0 18 18" aria-hidden="true" focusable="false"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.32-1.58-5.03-3.7H.96v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.97 10.72a5.4 5.4 0 0 1 0-3.44V4.95H.96a9 9 0 0 0 0 8.1l3.01-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58C13.46.9 11.43 0 9 0A9 9 0 0 0 .96 4.95l3.01 2.33C4.68 5.16 6.66 3.58 9 3.58z"/></svg>
+              Continuar com Google
+            </button>
+            <button type="button" class="secondary-button" id="demoButton" style="width:100%; margin-top:10px; justify-content:center;">
+              <i class="fa-solid fa-laptop-code"></i> Modo Demonstração (Dados Locais)
+            </button>
+          </div>
+
+          <div style="margin-top:22px; text-align:center;">
+            <a href="/" style="color:var(--muted); font-size:13px; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-arrow-left"></i> Voltar ao site principal
+            </a>
+          </div>
+        </div>
+
+        <div class="auth-box" id="deniedBox" hidden>
+          <div class="auth-brand">
+            <img src="/assets/logo-feclean.png" alt="Logo F&E Clean">
+            <div><strong>F&E Clean</strong><span>Higienização</span></div>
+          </div>
+          <div class="denied-icon"><i class="fa-solid fa-lock"></i></div>
+          <h1>Acesso não liberado</h1>
+          <p>A conta <strong id="deniedEmail">-</strong> não está autorizada a acessar os dados da F&E Clean.</p>
+          <p class="muted">Para liberar, solicite o acesso ao administrador ou entre com a senha da equipe.</p>
+          <div class="settings-actions">
+            <button type="button" class="secondary-button" id="deniedSignOut"><i class="fa-solid fa-right-from-bracket"></i> Tentar outra conta</button>
+            <button type="button" class="primary-button" id="deniedDemo"><i class="fa-solid fa-key"></i> Entrar com senha da equipe</button>
+          </div>
+        </div>
+
+        <footer class="auth-footer">
+          <span>Sistema interno · F&E Clean</span>
+          <div class="auth-footer-links"><a href="/" target="_blank">Site Oficial F&E Clean</a><span aria-hidden="true">•</span><a href="/lgpd.html">LGPD</a></div>
+        </footer>
+      </div>
+    </section>
+  </div>
+
+  <!-- Shell da Aplicação Administrativa -->
+  <div class="app-shell" hidden>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <img src="/assets/logo-feclean.png" alt="Logo F&E Clean" style="background:#fff; border-radius:12px; padding:3px;">
+        <div><strong>F&E Clean</strong><span>Higienização</span></div>
+        <button type="button" class="sidebar-close" id="sidebarClose" aria-label="Fechar menu"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <!-- Link Rápido para Voltar ao Site -->
+      <a href="/" class="sidebar-site-link" style="display:flex; align-items:center; gap:8px; padding:8px 14px; margin: 0 14px 10px; border-radius:10px; font-size:12px; font-weight:700; color:var(--blue); background:var(--blue-soft); text-decoration:none; transition:background 0.2s;">
+        <i class="fa-solid fa-arrow-left"></i> <span>Voltar ao site</span>
+      </a>
+
+      <nav aria-label="Navegação principal">
+        <button class="nav-item active" data-view="dashboard"><i class="fa-solid fa-house"></i><span>Início</span></button>
+        
+        <div class="nav-group">Operação</div>
+        <button class="nav-item" data-view="agenda"><i class="fa-regular fa-calendar"></i><span>Agenda</span></button>
+        <button class="nav-item" data-view="ordens"><i class="fa-solid fa-clipboard-check"></i><span>Atendimentos</span></button>
+        
+        <div class="nav-group">Gestão</div>
+        <button class="nav-item" data-view="clientes"><i class="fa-solid fa-users"></i><span>Clientes</span></button>
+        <button class="nav-item" data-view="servicos"><i class="fa-solid fa-spray-can-sparkles"></i><span>Serviços</span></button>
+        
+        <div class="nav-group">Negócio</div>
+        <button class="nav-item" data-view="financeiro"><i class="fa-solid fa-chart-simple"></i><span>Financeiro</span></button>
+        <button class="nav-item" data-view="configuracoes"><i class="fa-solid fa-gear"></i><span>Configurações</span></button>
+      </nav>
+
+      <footer>
+        <button type="button" class="sidebar-footer-btn" id="helpGuideButton" title="Abrir guia rápido">
+          <i class="fa-regular fa-circle-question"></i>
+          <span><strong>Guia rápido</strong><small>Ajuda e suporte</small></span>
+        </button>
+        <a class="sidebar-credit" href="/" target="_blank" rel="noopener noreferrer">F&E Clean · <strong>Higienização</strong></a>
+      </footer>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
+    <div class="content-shell">
+      <header class="topbar">
+        <button class="icon-button menu-button" id="menuButton" aria-label="Abrir menu" hidden><i class="fa-solid fa-bars"></i></button>
+        <div class="topbar-heading"><p id="eyebrow">Operação de hoje</p><h1 id="pageTitle">Visão geral</h1></div>
+        <div class="top-actions">
+          <span class="sync-badge" id="syncBadge" hidden></span>
+          <span class="mode-badge" id="modeBadge"></span>
+          <button class="secondary-button topbar-action topbar-share" id="shareClientLinkButton" aria-label="Enviar cadastro ao cliente" title="Enviar cadastro ao cliente"><i class="fa-regular fa-address-card" style="color: var(--blue);"></i><span>Enviar cadastro ao cliente</span></button>
+          <button class="icon-button topbar-action" id="notificationButton" aria-label="Ver alertas" title="Ver alertas"><i class="fa-regular fa-bell"></i><span class="notification-dot" id="notificationCount">0</span></button>
+          <button class="primary-button topbar-action topbar-new" data-open="appointment" aria-label="Novo agendamento" title="Novo agendamento" style="background:var(--blue); border-color:var(--blue);"><i class="fa-solid fa-plus"></i><span>Novo agendamento</span></button>
+          <div class="profile-menu" id="profileMenu">
+            <button type="button" class="profile-trigger" id="profileButton" aria-label="Abrir perfil" aria-haspopup="true" aria-expanded="false">
+              <span class="profile-avatar" id="profileAvatar" style="background:var(--blue);">
+                <span id="profileInitials">FE</span>
+                <img id="profilePhoto" alt="" hidden>
+              </span>
+            </button>
+            <div class="profile-popover" id="profilePopover" role="menu" hidden>
+              <div class="profile-summary">
+                <span class="profile-avatar profile-avatar-large" aria-hidden="true" style="background:var(--blue);">
+                  <span id="profileMenuInitials">FE</span>
+                  <img id="profileMenuPhoto" alt="" hidden>
+                </span>
+                <div>
+                  <strong id="profileName">Equipe F&E Clean</strong>
+                  <span id="profileEmail">feclean.higienizacao@gmail.com</span>
+                </div>
+              </div>
+              <span class="profile-access"><i class="fa-solid fa-circle-check"></i> Acesso liberado à F&E Clean</span>
+              <a class="profile-action" href="/" role="menuitem"><i class="fa-solid fa-globe"></i> Acessar site público</a>
+              <button type="button" class="profile-action profile-signout" id="profileSignOut" role="menuitem"><i class="fa-solid fa-right-from-bracket"></i> Sair da conta</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <div class="install-banner" id="installBanner" hidden>
+          <div class="install-banner-info">
+            <div class="install-banner-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+            <div>
+              <strong id="installBannerTitle">Instalar aplicativo F&E Clean</strong>
+              <p id="installBannerText">Acesso rápido na tela inicial do celular e funciona sem sinal em campo.</p>
+            </div>
+          </div>
+          <div class="install-banner-actions">
+            <button type="button" class="primary-button" id="bannerInstallButton">Instalar</button>
+            <button type="button" class="icon-button" id="dismissInstallBanner" aria-label="Fechar aviso"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
+
+        <!-- Tela Início / Dashboard -->
+        <section class="view active" id="view-dashboard">
+          <div class="metric-grid" id="dashboardMetrics"></div>
+          <div class="dashboard-grid">
+            <div class="dashboard-col">
+              <article class="panel" id="upcomingPanel">
+                <div class="panel-heading">
+                  <div><span class="overline">ROTA DO DIA</span><h3>Próximos serviços</h3></div>
+                  <button class="text-button" data-go="agenda">Ver agenda <i class="fa-solid fa-arrow-right"></i></button>
+                </div>
+                <div id="upcomingList" class="stack-list"></div>
+              </article>
+              <article class="panel" id="revenuePanel">
+                <div class="panel-heading">
+                  <div><span class="overline">DESEMPENHO</span><h3>Faturamento - últimos 6 meses</h3></div>
+                  <span class="muted">Receitas recebidas</span>
+                </div>
+                <div id="revenueChart" class="bar-chart"></div>
+              </article>
+            </div>
+
+            <div class="dashboard-col">
+              <!-- Próximos Aniversários -->
+              <article class="panel" id="birthdaysPanel">
+                <div class="panel-heading">
+                  <div><span class="overline">RELACIONAMENTO</span><h3>Próximos aniversários</h3></div>
+                  <span class="badge" style="color:#b45309; background:#fef3c7; font-weight:800; font-size:12px; padding:3px 8px; border-radius:8px;"><i class="fa-solid fa-cake-candles"></i></span>
+                </div>
+                <div id="birthdaysList" class="stack-list compact"></div>
+              </article>
+
+              <article class="panel" id="alertsPanel">
+                <div class="panel-heading">
+                  <div><span class="overline">ATENÇÃO</span><h3>Alertas</h3></div>
+                </div>
+                <div id="alertsList" class="stack-list compact"></div>
+              </article>
+
+              <article class="panel" id="recurrencePanel">
+                <div class="panel-heading">
+                  <div><span class="overline">RECORRÊNCIA</span><h3>Hora de chamar</h3></div>
+                </div>
+                <div id="recurrenceList" class="stack-list compact"></div>
+              </article>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tela Agenda -->
+        <section class="view" id="view-agenda">
+          <div class="toolbar">
+            <div class="date-nav"><button class="icon-button" id="agendaPrev"><i class="fa-solid fa-chevron-left"></i></button><button class="secondary-button" id="agendaToday">Hoje</button><button class="icon-button" id="agendaNext"><i class="fa-solid fa-chevron-right"></i></button><strong id="agendaPeriod"></strong></div>
+            <div class="segmented"><button data-mode="day">Dia</button><button class="active" data-mode="week">Semana</button><button data-mode="month">Mês</button></div>
+          </div>
+          <div class="status-legend"><span><i class="dot scheduled"></i> Agendado</span><span><i class="dot confirmed"></i> Confirmado</span><span><i class="dot in_service"></i> Em atendimento</span><span><i class="dot completed"></i> Concluído</span><span><i class="dot canceled"></i> Cancelado</span></div>
+          <div class="calendar panel" id="calendar"></div>
+        </section>
+
+        <!-- Tela Clientes -->
+        <section class="view" id="view-clientes">
+          <div class="section-actions"><label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="clientSearch" type="search" placeholder="Buscar por nome, telefone ou bairro"></label><button class="secondary-button" id="copyClientLink"><i class="fa-solid fa-link"></i> Link público</button><button class="primary-button" data-open="client" style="background:var(--blue); border-color:var(--blue);"><i class="fa-solid fa-user-plus"></i> Novo cliente</button></div>
+          <div class="mini-metrics" id="clientMetrics"></div>
+          <div class="card-grid" id="clientGrid"></div>
+        </section>
+
+        <!-- Tela Serviços -->
+        <section class="view" id="view-servicos">
+          <div class="section-actions"><div class="section-intro"><div><span class="overline">CATÁLOGO F&amp;E CLEAN</span><h2>Serviços e duração média</h2><p>Referências operacionais para orçamento e agenda da F&E Clean.</p></div></div><button class="primary-button" data-open="service" style="background:var(--blue); border-color:var(--blue);"><i class="fa-solid fa-plus"></i> Novo serviço</button></div>
+          <div class="service-grid" id="serviceGrid"></div>
+        </section>
+
+        <!-- Tela Financeiro -->
+        <section class="view" id="view-financeiro">
+          <div class="section-actions"><div class="period-filter"><label>Período <input id="financeMonth" type="month"></label></div><button class="primary-button" data-open="transaction" style="background:var(--blue); border-color:var(--blue);"><i class="fa-solid fa-plus"></i> Novo lançamento</button></div>
+          <div class="metric-grid financial" id="financeMetrics"></div>
+          <div class="dashboard-grid">
+            <article class="panel span-2"><div class="panel-heading"><div><span class="overline">FLUXO DE CAIXA</span><h3>Movimentações do período</h3></div></div><div class="table-wrap"><table><thead><tr><th>Data</th><th>Descrição</th><th>Forma</th><th>Status</th><th>Valor</th><th></th></tr></thead><tbody id="transactionRows"></tbody></table></div></article>
+            <article class="panel"><div class="panel-heading"><div><span class="overline">POR SERVIÇO</span><h3>Composição da receita</h3></div></div><div id="serviceRevenue" class="progress-list"></div></article>
+          </div>
+        </section>
+
+        <!-- Tela Atendimentos / Ordens de Serviço -->
+        <section class="view" id="view-ordens">
+          <div class="section-actions"><label class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input id="orderSearch" type="search" placeholder="Buscar OS, cliente ou endereço"></label><button class="primary-button" data-open="appointment" style="background:var(--blue); border-color:var(--blue);"><i class="fa-solid fa-plus"></i> Nova ordem</button></div>
+          <div class="order-list" id="orderList"></div>
+        </section>
+
+        <!-- Tela Configurações -->
+        <section class="view" id="view-configuracoes">
+          <div class="settings-grid">
+            <article class="panel" id="companyPanel"><div class="panel-heading"><div><span class="overline">EMPRESA</span><h3>Dados da F&E Clean</h3></div></div><div class="company-card"><img src="/assets/logo-feclean.png" alt="Logo F&E Clean" style="background:#fff; border-radius:14px; padding:4px;"><div><strong>F&E Clean</strong><p>Higienização e impermeabilização de estofados</p></div></div><dl class="data-list"><div><dt>Telefone</dt><dd>(16) 92004-7362</dd></div><div><dt>E-mail</dt><dd>feclean.higienizacao@gmail.com</dd></div><div><dt>Instagram</dt><dd>@feclean.higienizacao</dd></div><div><dt>Região</dt><dd>Ribeirão Preto e região</dd></div><div><dt>Horário</dt><dd>Seg-sex 08h-18h · Sáb 08h-14h</dd></div></dl></article>
+            <article class="panel" id="templatesPanel"><div class="panel-heading"><div><span class="overline">MENSAGENS</span><h3>WhatsApp Automático</h3></div></div><p class="muted">Textos padrão de confirmação, garantia e lembretes enviados aos clientes.</p><div class="settings-actions"><button type="button" class="primary-button" data-open="settings" style="background:var(--success); border-color:var(--success);"><i class="fa-brands fa-whatsapp"></i> Editar mensagens</button></div></article>
+            <article class="panel" id="notifyPanel"><div class="panel-heading"><div><span class="overline">LEMBRETES</span><h3>Agenda e horários</h3></div></div><p class="muted">Mostra o resumo do dia e avisa 30 minutos antes de atendimentos e devoluções.</p><div class="auth-notice aviso" id="notifyDeniedAlert" hidden><i class="fa-solid fa-triangle-exclamation"></i><span>Lembretes bloqueados no aparelho. Para reativar, abra os Ajustes e ative Notificações.</span></div><div class="settings-actions"><button type="button" class="primary-button" id="notifyButton"><i class="fa-regular fa-bell"></i> Ativar lembretes</button><button type="button" class="secondary-button" id="notifyTest" hidden><i class="fa-solid fa-vial"></i> Testar agora</button></div><dl class="data-list"><div><dt>Permissão</dt><dd id="notifyStatus">-</dd></div><div><dt>Em segundo plano</dt><dd id="notifyBackground">-</dd></div></dl></article>
+            <article class="panel" id="appPanel"><div class="panel-heading"><div><span class="overline">APLICATIVO</span><h3>Instalar no celular</h3></div></div><p class="muted" id="installText">Instale a F&E Clean no celular da equipe para abrir em tela cheia, com ícone próprio, e continuar funcionando sem sinal na casa do cliente.</p><div class="settings-actions"><button type="button" class="primary-button" id="installButton" hidden><i class="fa-solid fa-download"></i> Instalar aplicativo</button><button type="button" class="secondary-button" id="reloadAppButton"><i class="fa-solid fa-arrows-rotate"></i> Atualizar aplicativo</button></div><dl class="data-list"><div><dt>Instalação</dt><dd id="installStatus">-</dd></div><div><dt>Uso offline</dt><dd id="offlineStatus">-</dd></div></dl></article>
+
+            <article class="panel" id="cloudPanel"><div class="panel-heading"><div><span class="overline">ACESSO</span><h3>Gestão da Equipe</h3></div></div><p class="muted">Acesso sincronizado em tempo real entre os aparelhos e computadores da equipe F&E Clean.</p><dl class="data-list"><div><dt>Nome</dt><dd id="accountName">Equipe F&E Clean</dd></div><div><dt>Status</dt><dd id="accountEmail">Acesso Ativo</dd></div></dl><div class="settings-actions"><a class="secondary-button" href="/" target="_blank"><i class="fa-solid fa-globe"></i> Ver site</a><button type="button" class="danger-button" id="signOut"><i class="fa-solid fa-right-from-bracket"></i> Sair do painel</button></div></article>
+          </div>
+        </section>
+      </main>
+
+      <!-- Bottom Nav Mobile -->
+      <nav class="bottom-nav" id="bottomNav" aria-label="Navegação rápida">
+        <button class="bottom-nav-item active" data-view="dashboard"><i class="fa-solid fa-house"></i><span>Início</span></button>
+        <button class="bottom-nav-item" data-view="agenda"><i class="fa-regular fa-calendar"></i><span>Agenda</span></button>
+        <button class="bottom-nav-item" data-view="ordens"><i class="fa-solid fa-clipboard-check"></i><span>Atendimentos</span></button>
+        <button class="bottom-nav-item" data-view="clientes"><i class="fa-solid fa-users"></i><span>Clientes</span></button>
+        <button class="bottom-nav-item" id="bottomNavMenu"><i class="fa-solid fa-bars"></i><span>Mais</span></button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Drawer de Alertas -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="alert-drawer" id="alertDrawer"><div class="drawer-heading"><h2>Central de alertas</h2><button type="button" class="icon-button" id="closeAlerts" aria-label="Fechar alertas"><i class="fa-solid fa-xmark"></i></button></div><div id="drawerAlerts" class="stack-list"></div></aside>
+
+  <!-- Modais do Sistema -->
+  <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-heading"><div class="modal-heading-copy"><span class="overline" id="modalEyebrow">NOVO REGISTRO</span><h2 id="modalTitle">Cadastro</h2></div><button type="button" class="secondary-button modal-client-invite" id="modalClientInvite" hidden><i class="fa-regular fa-address-card"></i><span>Enviar cadastro</span></button><button class="icon-button" id="modalClose" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button></div>
+      
+      <!-- Formulário de Agendamento -->
+      <form id="appointmentForm" class="modal-form" hidden>
+        <div class="form-grid">
+          <label class="span-2">Cliente<select name="clientId" required></select><small class="appointment-client-status" id="appointmentClientStatus" hidden></small></label>
+          <label>Serviço<select name="serviceId" required></select></label>
+          <label>Responsável / Equipe<input name="team" placeholder="Ex.: Leonardo"></label>
+          <label>Data<input type="date" name="date" required></label>
+          <label>Horário<input type="time" name="time" required></label>
+          <label>Duração estimada<input type="number" name="duration" min="30" step="30" required></label>
+          <label>Valor (R$)<input type="tel" name="value" class="mask-currency" required></label>
+          <div class="return-schedule span-2" id="returnSchedule" hidden>
+            <div class="return-schedule-heading"><i class="fa-solid fa-truck-fast"></i><div><strong>Devolução ao cliente</strong><span>Será adicionada à agenda e aos lembretes.</span></div></div>
+            <div class="return-schedule-fields"><label>Data da devolução<input type="date" name="returnDate"></label><label>Horário<input type="time" name="returnTime" value="17:00"></label></div>
+          </div>
+          <label>Status<select name="status"><option value="scheduled">Agendado</option><option value="confirmed">Confirmado</option><option value="in_service">Em atendimento</option><option value="completed">Concluído</option><option value="canceled">Cancelado</option></select></label>
+          <label>Pagamento<select name="paymentStatus"><option value="pending">A receber</option><option value="paid">Pago</option></select></label>
+          <label>Forma de pagamento<select name="paymentMethod"><option>PIX</option><option>Cartão</option><option>Dinheiro</option><option>Transferência</option></select></label>
+          <label class="span-2">Endereço do atendimento<input name="address" required></label>
+          <label class="span-2">Observações<textarea name="notes" rows="3" placeholder="Tecido, nível de sujidade, acesso, pets..."></textarea></label>
+        </div>
+        <div class="form-actions"><button type="button" class="secondary-button" data-close>Cancelar</button><button class="primary-button" type="submit" style="background:var(--blue); border-color:var(--blue);">Salvar agendamento</button></div>
+      </form>
+
+      <!-- Formulário de Cliente -->
+      <form id="clientForm" class="modal-form" hidden>
+        <div class="form-grid">
+          <label>Nome<input name="firstName" required placeholder="Primeiro nome"></label>
+          <label>Sobrenome<input name="lastName" required placeholder="Sobrenome"></label>
+          <label>WhatsApp<input type="tel" name="phone" class="mask-phone" inputmode="numeric" required placeholder="(00) 00000-0000" maxlength="15"></label>
+          <label>Data de Nascimento<input type="date" name="birthDate"></label>
+          <label>Tipo de pessoa<select name="documentType"><option value="cpf">Pessoa Física (CPF)</option><option value="cnpj">Pessoa Jurídica (CNPJ)</option></select></label>
+          <label>Documento (opcional)<input type="tel" name="document" class="mask-document" inputmode="numeric" placeholder="000.000.000-00" maxlength="14"></label>
+          <label>CEP<div class="input-with-action"><input type="tel" name="cep" class="mask-cep" inputmode="numeric" required placeholder="00000-000" maxlength="9"><button type="button" class="secondary-button" id="clientCepSearch" aria-label="Buscar CEP" title="Buscar CEP"><i class="fa-solid fa-magnifying-glass"></i></button></div></label>
+          <label>Bairro<input name="neighborhood" required placeholder="Bairro"></label>
+          <label class="span-2">Rua / Avenida<input name="address" required placeholder="Nome da rua"></label>
+          <label>Número<input name="number" class="numbers-only" inputmode="numeric" required placeholder="Ex.: 123"></label>
+          <label>Complemento<input name="complement" placeholder="Apto, Casa 2..."></label>
+          <label class="span-2">Cidade<input name="city" required placeholder="Cidade" value="Ribeirão Preto"></label>
+        </div>
+        <div class="form-actions"><button type="button" class="secondary-button" data-close>Cancelar</button><button class="primary-button" type="submit" style="background:var(--blue); border-color:var(--blue);">Salvar cliente</button></div>
+      </form>
+
+      <!-- Formulário de Transação Financeira -->
+      <form id="transactionForm" class="modal-form" hidden>
+        <div class="form-grid">
+          <label>Tipo<select name="type"><option value="income">Receita</option><option value="expense">Despesa</option></select></label>
+          <label>Data<input name="date" type="date" required></label>
+          <label class="span-2">Descrição<input name="description" required placeholder="Ex.: Higienização de sofá, compra de produto..."></label>
+          <label>Valor (R$)<input name="value" type="tel" class="mask-currency" required></label>
+          <label>Forma<select name="paymentMethod"><option>PIX</option><option>Cartão</option><option>Dinheiro</option><option>Boleto</option><option>Transferência</option></select></label>
+          <label>Status<select name="status"><option value="paid">Pago / Recebido</option><option value="pending">Pendente</option></select></label>
+          <label>Categoria<input name="category" placeholder="Serviço, combustível, insumos..."></label>
+        </div>
+        <div class="form-actions"><button type="button" class="secondary-button" data-close>Cancelar</button><button class="primary-button" type="submit" style="background:var(--blue); border-color:var(--blue);">Salvar lançamento</button></div>
+      </form>
+
+      <!-- Formulário de Serviço -->
+      <form id="serviceForm" class="modal-form" hidden>
+        <div class="form-grid">
+          <label class="span-2">Nome do serviço<input name="name" required placeholder="Ex.: Higienização de sofá retrátil"></label>
+          <label>Ícone / Categoria<select name="icon"><option value="sofa">Sofá</option><option value="chair">Cadeira / Poltrona</option><option value="mattress">Colchão</option><option value="rug">Tapete / Carpete</option><option value="shield">Impermeabilização / Proteção</option><option value="pet">Pet / Manchas e odores</option><option value="baby">Infantil / Carrinhos</option><option value="business">Empresarial / Corporativo</option><option value="sparkles">Geral / Outros</option><option value="custom">+ Adicionar outra categoria</option></select></label>
+          <label id="serviceCustomCategory" hidden>Nome da nova categoria<input name="customCategory" maxlength="60" placeholder="Ex.: Cortinas / Persianas"></label>
+          <label>Duração estimada (minutos)<input type="number" name="duration" min="15" step="15" value="120" required></label>
+          <label>Preço base (R$)<input type="tel" name="basePrice" class="mask-currency" required></label>
+          <label>Status<select name="active"><option value="true">Ativo (visível na agenda)</option><option value="false">Inativo</option></select></label>
+          <label>Possui devolução?<select name="requiresReturn"><option value="false">Não</option><option value="true">Sim, retirar e devolver</option></select></label>
+          <label id="serviceReturnDays" hidden>Prazo padrão (dias)<input type="number" name="returnDays" min="1" max="60" value="7"></label>
+          <label class="span-2">Descrição operacional<textarea name="description" rows="3" placeholder="Detalhes técnicos, produtos recomendados e orientações..."></textarea></label>
+        </div>
+        <div class="form-actions"><button type="button" class="secondary-button" data-close>Cancelar</button><button class="primary-button" type="submit" style="background:var(--blue); border-color:var(--blue);">Salvar serviço</button></div>
+      </form>
+
+      <!-- Formulário de Mensagens WhatsApp -->
+      <form id="settingsForm" class="modal-form" hidden>
+        <div class="form-grid">
+          <label class="span-2">Mensagem de Confirmação<textarea name="msgConfirmacao" rows="3" required></textarea><small>Use <code>{{cliente}}</code>, <code>{{servico}}</code>, <code>{{data}}</code>, <code>{{hora}}</code></small></label>
+          <label class="span-2">Comprovante e Garantia<textarea name="msgGarantia" rows="5" required></textarea><small>Use <code>{{cliente}}</code>, <code>{{servico}}</code></small></label>
+          <label class="span-2">Lembrete de Retorno (Pós-Venda)<textarea name="msgLembrete" rows="3" required></textarea><small>Use <code>{{cliente}}</code></small></label>
+          <label class="span-2">Mensagem de Aniversário<textarea name="msgAniversario" rows="3"></textarea><small>Use <code>{{cliente}}</code>, <code>{{data}}</code></small></label>
+        </div>
+        <div class="form-actions"><button type="button" class="secondary-button" data-close>Cancelar</button><button class="primary-button" type="submit" style="background:var(--blue); border-color:var(--blue);">Salvar mensagens</button></div>
+      </form>
+
+      <div id="detailContent" hidden></div>
+      
+      <!-- Guia Rápido -->
+      <div id="guideContent" hidden>
+        <section class="guide-intro"><span class="guide-icon"><i class="fa-solid fa-compass"></i></span><div><span class="overline">BEM-VINDO À F&amp;E CLEAN</span><h3>Seu sistema de operação, do agendamento ao financeiro</h3><p>Guia rápido de uso para a equipe de atendimento.</p></div></section>
+
+        <div class="guide-steps">
+          <article><span>1</span><div><strong>Configure os serviços</strong><small>Serviços → Novo serviço</small><p>Cadastre preço, duração e categoria. Para tapetes levados para lavagem, ative a devolução.</p></div></article>
+          <article><span>2</span><div><strong>Cadastre ou convide o cliente</strong><small>Clientes ou Novo agendamento</small><p>Cadastre manualmente com busca de CEP ou envie o link público ao cliente.</p></div></article>
+          <article><span>3</span><div><strong>Crie o agendamento</strong><small>Botão + no cabeçalho</small><p>Defina cliente, serviço, equipe, data e valor. O sistema organiza a rota do dia.</p></div></article>
+          <article><span>4</span><div><strong>Acompanhe e conclua</strong><small>Agenda e Atendimentos</small><p>Abra a OS para confirmar via WhatsApp, iniciar, concluir e emitir comprovante.</p></div></article>
+        </div>
+
+        <section class="guide-details" aria-label="Funcionalidades do sistema">
+          <details open><summary><i class="fa-solid fa-house"></i> Início e alertas <i class="fa-solid fa-chevron-down"></i></summary><p>O painel resume faturamento, serviços concluídos, recorrência e ticket médio.</p></details>
+          <details><summary><i class="fa-regular fa-calendar"></i> Agenda e WhatsApp <i class="fa-solid fa-chevron-down"></i></summary><p>Atendimentos por horário e status. Envie confirmações prontas com um clique pelo WhatsApp.</p></details>
+          <details><summary><i class="fa-solid fa-users"></i> Clientes e pós-venda <i class="fa-solid fa-chevron-down"></i></summary><p>Ficha com histórico, total gasto e data recomendada para a próxima higienização.</p></details>
+          <details><summary><i class="fa-solid fa-clipboard-check"></i> Ordens e financeiro <i class="fa-solid fa-chevron-down"></i></summary><p>Ao marcar um serviço como concluído/pago, a receita entra automaticamente no financeiro.</p></details>
+        </section>
+
+        <aside class="guide-support"><i class="fa-brands fa-whatsapp"></i><div><strong>Dúvidas da equipe?</strong><span>WhatsApp F&E Clean: <a href="https://wa.me/5516920047362" target="_blank" rel="noopener noreferrer">(16) 92004-7362</a></span></div></aside>
+        <label class="guide-preference"><input type="checkbox" id="guideDontShow"> <span>Não mostrar este guia automaticamente novamente</span></label>
+        <div class="form-actions guide-actions"><button type="button" class="primary-button" data-close style="background:var(--blue); border-color:var(--blue);">Começar a usar</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Completo de Ordem de Serviço com Assinatura e Download de PDF -->
+  <div class="os-modal-backdrop" id="osModalBackdrop" aria-hidden="true" hidden>
+    <div class="os-modal-container" role="dialog" aria-modal="true" aria-labelledby="osModalTitle">
+      <!-- Barra Superior de Controle -->
+      <header class="os-modal-header no-print">
+        <div class="os-modal-header-info">
+          <button type="button" class="icon-button" id="osModalClose" aria-label="Fechar OS"><i class="fa-solid fa-arrow-left"></i></button>
+          <div>
+            <span class="overline">ORDEM DE SERVIÇO &amp; ASSINATURA</span>
+            <h2 id="osModalTitle" style="font-size:18px; margin:0; letter-spacing:-0.02em;">OS #<span id="osDocNumber">NOVA</span></h2>
+          </div>
+        </div>
+        <div class="os-modal-header-actions">
+          <button type="button" class="secondary-button" id="osBtnLimparAssinatura" title="Limpar apenas a assinatura do cliente"><i class="fa-solid fa-eraser"></i> Limpar Assinatura</button>
+          <button type="button" class="secondary-button" id="osBtnSalvarOs" style="color:var(--success); border-color:var(--success);"><i class="fa-solid fa-floppy-disk"></i> Salvar na OS</button>
+          <button type="button" class="secondary-button" id="osBtnVisualizarPdf" title="Abrir PDF em nova aba para visualizar"><i class="fa-solid fa-arrow-up-right-from-square"></i> Visualizar</button>
+          <button type="button" class="primary-button" id="osBtnBaixarPdf" style="background:var(--blue); border-color:var(--blue);"><i class="fa-solid fa-file-pdf"></i> Baixar PDF</button>
+          <button type="button" class="secondary-button" id="osBtnImprimir" title="Imprimir"><i class="fa-solid fa-print"></i></button>
+        </div>
+      </header>
+
+      <!-- Área de Visualização e Preenchimento do Documento A4 -->
+      <div class="os-document-scroll">
+        <article class="os-sheet" id="osPrintableDoc">
+          <!-- Cabeçalho do Documento -->
+          <div class="os-header">
+            <div class="os-header-logo">
+              <img src="/assets/logo-feclean.png" alt="F&E Clean Logo" class="os-logo-img">
+            </div>
+            <div class="os-header-titles">
+              <h1 class="os-title">ORDEM DE SERVIÇO</h1>
+              <p class="os-subtitle">HIGIENIZAÇÃO E IMPERMEABILIZAÇÃO DE ESTOFADOS</p>
+            </div>
+            <div class="os-header-meta">
+              <div class="os-meta-pill">
+                <span>Nº DA OS</span>
+                <strong id="osDocBadgeNumber">#0000</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- 1. Identificação do Cliente -->
+          <section class="os-section">
+            <h3 class="os-section-title"><i class="fa-regular fa-user"></i> IDENTIFICAÇÃO DO CLIENTE</h3>
+            <div class="os-grid-3">
+              <div class="os-field span-2">
+                <label>Nome Completo</label>
+                <input type="text" id="osFieldClientName" class="os-input" placeholder="Ex: Sr(a). João Silva">
+              </div>
+              <div class="os-field">
+                <label>Contato / WhatsApp</label>
+                <input type="text" id="osFieldClientPhone" class="os-input mask-phone" placeholder="(16) 90000-0000">
+              </div>
+              <div class="os-field">
+                <label>Data do Serviço</label>
+                <input type="date" id="osFieldDate" class="os-input">
+              </div>
+              <div class="os-field span-2">
+                <label>Modalidade do Serviço</label>
+                <select id="osFieldServiceType" class="os-input os-select">
+                  <option value="Higienização Técnica">Higienização Técnica</option>
+                  <option value="Impermeabilização">Impermeabilização</option>
+                  <option value="Higienização + Impermeabilização">Higienização + Impermeabilização</option>
+                  <option value="Limpeza de Colchão">Limpeza de Colchão</option>
+                  <option value="Limpeza de Tapete">Limpeza de Tapete</option>
+                  <option value="Higienização Automotiva">Higienização Automotiva</option>
+                </select>
+              </div>
+              <div class="os-field span-3">
+                <label>Endereço do Atendimento</label>
+                <input type="text" id="osFieldAddress" class="os-input" placeholder="Rua, número, bairro, cidade">
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. Laudo Técnico Preliminar -->
+          <section class="os-section os-report-section">
+            <h3 class="os-section-title"><i class="fa-solid fa-clipboard-check"></i> LAUDO TÉCNICO PRELIMINAR</h3>
+            
+            <div class="os-grid-2">
+              <!-- Composição Têxtil -->
+              <div class="os-report-group">
+                <label class="os-group-label">COMPOSIÇÃO TÊXTIL</label>
+                <div class="os-chips-grid" id="osFabricsGroup">
+                  <label class="os-chip"><input type="checkbox" value="Suede"><span>Suede</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Linho"><span>Linho</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Chenille"><span>Chenille</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Algodão"><span>Algodão</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Tecido Sintético"><span>Tecido Sintético</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Couro/Courino"><span>Couro/Courino</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Veludo"><span>Veludo</span></label>
+                </div>
+              </div>
+
+              <!-- Nível de Contaminação -->
+              <div class="os-report-group">
+                <label class="os-group-label">NÍVEL DE CONTAMINAÇÃO</label>
+                <div class="os-segmented-control" id="osDirtLevelGroup">
+                  <label class="os-seg-btn"><input type="radio" name="osDirtLevel" value="Leve"><span>Leve</span></label>
+                  <label class="os-seg-btn"><input type="radio" name="osDirtLevel" value="Moderado" checked><span>Moderado</span></label>
+                  <label class="os-seg-btn"><input type="radio" name="osDirtLevel" value="Intenso"><span>Intenso</span></label>
+                </div>
+              </div>
+
+              <!-- Condição Estrutural -->
+              <div class="os-report-group">
+                <label class="os-group-label">CONDIÇÃO ESTRUTURAL PRÉ-EXISTENTE</label>
+                <div class="os-chips-grid" id="osConditionsGroup">
+                  <label class="os-chip"><input type="checkbox" value="Novo"><span>Novo</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Manchado"><span>Manchado</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Desbotado"><span>Desbotado</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Com Rasgos"><span>Com Rasgos</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Amassado"><span>Amassado</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Com Odor"><span>Com Odor</span></label>
+                </div>
+              </div>
+
+              <!-- Agentes Contaminantes -->
+              <div class="os-report-group">
+                <label class="os-group-label">AGENTES CONTAMINANTES</label>
+                <div class="os-chips-grid" id="osDirtTypesGroup">
+                  <label class="os-chip"><input type="checkbox" value="Mofo"><span>Mofo</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Molho / Alimentos"><span>Molho / Alimentos</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Poeira / Ácaros"><span>Poeira / Ácaros</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Terra"><span>Terra</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Urina Pet"><span>Urina Pet</span></label>
+                  <label class="os-chip"><input type="checkbox" value="Outros"><span>Outros</span></label>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 3. Observações -->
+          <section class="os-section">
+            <h3 class="os-section-title"><i class="fa-regular fa-note-sticky"></i> NOTAS ADICIONAIS E OBSERVAÇÕES ESPECIAIS</h3>
+            <textarea id="osFieldObservations" class="os-textarea" rows="2" placeholder="Descreva aqui detalhes específicos do serviço, instruções de acesso, animais de estimação, etc."></textarea>
+          </section>
+
+          <!-- 4. Assinaturas e Valor -->
+          <section class="os-section os-signatures-section">
+            <div class="os-sig-grid">
+              <!-- Responsável Técnico (Assinatura Fixa) -->
+              <div class="os-sig-box">
+                <span class="os-sig-label">RESPONSÁVEL TÉCNICO</span>
+                <div class="os-sig-card os-tech-card">
+                  <div class="os-tech-name" id="osTechName">Fábio Sinhoreli Aguiar</div>
+                  <div class="os-tech-badge">F&amp;E CLEAN SPECIALIST</div>
+                </div>
+              </div>
+
+              <!-- Assinatura do Cliente (Canvas Interativo) -->
+              <div class="os-sig-box">
+                <div class="os-sig-header-row">
+                  <span class="os-sig-label">ASSINATURA DO CLIENTE</span>
+                  <button type="button" class="os-sig-clear-link no-print" id="osBtnLimparCanvas"><i class="fa-solid fa-rotate-left"></i> Limpar</button>
+                </div>
+                <div class="os-sig-card os-client-canvas-wrap">
+                  <canvas id="osSignatureCanvas" width="450" height="110"></canvas>
+                  <div class="os-sig-instruction no-print" id="osSigInstruction">Assine aqui com dedo ou mouse</div>
+                </div>
+                <small class="os-sig-legal">Declaro estar ciente e de acordo com o laudo preliminar e serviços descritos.</small>
+              </div>
+
+              <!-- Investimento -->
+              <div class="os-sig-box">
+                <span class="os-sig-label">INVESTIMENTO TOTAL</span>
+                <div class="os-price-card">
+                  <div class="os-price-row">
+                    <span class="os-price-prefix">R$</span>
+                    <input type="text" id="osFieldPrice" class="os-price-val mask-currency" placeholder="0,00">
+                  </div>
+                  <div class="os-pay-row">
+                    <label>Forma de Pagamento:</label>
+                    <select id="osFieldPaymentMethod" class="os-pay-select">
+                      <option>PIX</option>
+                      <option>Cartão</option>
+                      <option>Dinheiro</option>
+                      <option>Transferência</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 5. Rodapé Institucional e Garantia -->
+          <footer class="os-footer">
+            <div class="os-footer-badges">
+              <span><i class="fa-solid fa-shield-halved"></i> Selo de Qualidade F&amp;E Clean</span>
+              <span><i class="fa-solid fa-droplet"></i> Ativos Notificados ANVISA</span>
+              <span><i class="fa-solid fa-wind"></i> Secagem Inteligente (12h a 24h)</span>
+            </div>
+            <div class="os-footer-contact">
+              <span><i class="fa-brands fa-whatsapp"></i> (16) 92004-7362</span>
+              <span><i class="fa-brands fa-instagram"></i> @feclean1</span>
+              <span><i class="fa-solid fa-location-dot"></i> Ribeirão Preto e Região</span>
+            </div>
+          </footer>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script type="module" src="/js/app.js?v=40"></script>
+</body>
+</html>

@@ -7,7 +7,7 @@
 // Suba a VERSAO a cada alteração de arquivo estático: o cache antigo é
 // descartado no activate.
 
-const VERSAO = 'feclean-v45';
+const VERSAO = 'feclean-v46';
 const CACHE_APP = `${VERSAO}-app`;
 const CACHE_EXTERNO = `${VERSAO}-externo`;
 const CACHE_DADOS = 'feclean-dados';
@@ -33,10 +33,17 @@ const APP_SHELL = [
   '/lgpd.html',
   '/js/cadastro.js?v=3',
   '/manifest.webmanifest',
+  '/favicon.png',
+  '/favicon.ico',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon-maskable-512.png',
+  '/apple-touch-icon.png',
   '/assets/logo-feclean.png',
   '/assets/icon-192.png',
   '/assets/icon-512.png',
-  '/assets/icon-maskable-512.png'
+  '/assets/icon-maskable-512.png',
+  '/assets/apple-touch-icon.png'
 ];
 
 // Hosts de terceiros que valem cachear: SDK, fontes e ícones.

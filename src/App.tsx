@@ -802,7 +802,7 @@ function LandingPage() {
         href="https://wa.me/5516920047362" 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="fixed bottom-6 right-6 w-16 h-16 bg-brand-green text-white rounded-full flex items-center justify-center shadow-2xl hover:bg-brand-green-hover transition-all duration-300 hover:scale-110 z-50 hover:shadow-brand-green/50 active:scale-95"
+        className="fixed bottom-[21px] right-[84px] w-16 h-16 bg-brand-green text-white rounded-full flex items-center justify-center shadow-2xl hover:bg-brand-green-hover transition-all duration-300 hover:scale-110 z-50 hover:shadow-brand-green/50 active:scale-95"
         style={{ boxShadow: '0 8px 30px rgba(15,156,46,0.4)' }}
       >
         <WhatsAppIcon size={30} />

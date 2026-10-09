@@ -23,7 +23,8 @@ import {
   Star,
   ChevronRight,
   ChevronLeft,
-  Check
+  Check,
+  ArrowUpRight
 } from 'lucide-react';
 
 import fotoSofaMetade from './foto_sofa_metade.jpg';
@@ -772,28 +773,204 @@ function LandingPage() {
         </div>
       </section>
 
-      {/* ─── Rodapé (Footer) ─── */}
-      <footer className="bg-black py-8 px-6 text-center text-white/50 text-[10px] md:text-xs font-semibold relative z-10">
-        <a 
-          href="https://wa.me/5516920047362" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="text-[#e04060] hover:text-[#f85c7c] transition-colors mb-3 block font-bold uppercase tracking-widest"
-        >
-          Política de Privacidade
-        </a>
-        <div className="flex items-center justify-center gap-2 text-slate-400">
-          <p>
-            Copyright © 2026 – F&E Clean Higienização de Estofados – Todos os direitos reservados
-          </p>
-          <a
-            href="/admin/"
-            title="Acesso Restrito"
-            aria-label="Acesso Restrito"
-            className="text-slate-600 hover:text-slate-300 transition-colors p-1.5 rounded-full hover:bg-white/5 opacity-40 hover:opacity-100"
-          >
-            <Lock size={12} />
-          </a>
+      {/* ─── Rodapé (Footer) - Estilo Lexion ─── */}
+      <footer className="bg-[#060913] text-slate-400 relative z-10 pt-16 pb-12 px-6 lg:px-12 border-t border-white/[0.08]">
+        <div className="max-w-7xl mx-auto">
+          {/* Main Footer Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-14">
+            
+            {/* Coluna 1: Marca & Proposta de Valor */}
+            <div className="lg:col-span-5 flex flex-col items-start">
+              {/* Logo & Nome */}
+              <div className="flex items-center gap-3.5 mb-5">
+                <div className="w-12 h-12 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-lg shadow-black/30 border border-white/20 flex-shrink-0">
+                  <img src={logo} alt="F&E Clean" className="w-full h-full object-contain" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-sans font-extrabold text-xl tracking-wider leading-none text-white">
+                    F<span className="text-brand-blue">&amp;</span>E CLEAN
+                  </span>
+                  <span className="text-[9px] uppercase tracking-[0.25em] text-brand-blue font-bold mt-1">
+                    Higienização de Estofados
+                  </span>
+                </div>
+              </div>
+
+              {/* Bio / Descrição */}
+              <p className="text-slate-400 text-sm leading-relaxed max-w-sm mb-6">
+                Higienização profunda, impermeabilização e cuidados especializados para residências e empresas que prezam por saúde, conforto e durabilidade.
+              </p>
+
+              {/* Badge de Destaque (Estilo Lexion) */}
+              <div className="inline-flex items-center gap-3 text-xs md:text-sm font-semibold text-slate-200">
+                <div className="w-5 h-5 rounded-full border border-brand-blue/80 bg-brand-blue/10 flex items-center justify-center text-brand-blue flex-shrink-0">
+                  <Check size={12} strokeWidth={3} />
+                </div>
+                <span>Qualidade, tecnologia e biossegurança no mesmo atendimento</span>
+              </div>
+            </div>
+
+            {/* Coluna 2: Navegue */}
+            <div className="lg:col-span-2">
+              <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-white mb-5">
+                Navegue
+              </h3>
+              <ul className="space-y-3.5 text-sm">
+                <li>
+                  <a href="#servicos" className="hover:text-white transition-colors duration-200">
+                    Serviços
+                  </a>
+                </li>
+                <li>
+                  <a href="#sobre" className="hover:text-white transition-colors duration-200">
+                    Sobre
+                  </a>
+                </li>
+                <li>
+                  <a href="#resultados" className="hover:text-white transition-colors duration-200">
+                    Resultados
+                  </a>
+                </li>
+                <li>
+                  <a href="#depoimentos" className="hover:text-white transition-colors duration-200">
+                    Depoimentos
+                  </a>
+                </li>
+                <li>
+                  <a href="#faq" className="hover:text-white transition-colors duration-200">
+                    Dúvidas
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Coluna 3: Soluções */}
+            <div className="lg:col-span-2">
+              <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-white mb-5">
+                Soluções
+              </h3>
+              <ul className="space-y-3.5 text-sm">
+                <li>
+                  <a href="#servicos" className="hover:text-white transition-colors duration-200">
+                    Higienização de Sofás
+                  </a>
+                </li>
+                <li>
+                  <a href="#servicos" className="hover:text-white transition-colors duration-200">
+                    Impermeabilização
+                  </a>
+                </li>
+                <li>
+                  <a href="#servicos" className="hover:text-white transition-colors duration-200">
+                    Limpeza de Colchões
+                  </a>
+                </li>
+                <li>
+                  <a href="#servicos" className="hover:text-white transition-colors duration-200">
+                    Estofados Automotivos
+                  </a>
+                </li>
+                <li>
+                  <a href="#servicos" className="hover:text-white transition-colors duration-200">
+                    Cadeiras e Poltronas
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Coluna 4: Fale com a F&E */}
+            <div className="lg:col-span-3 lg:col-start-10 flex flex-col">
+              <h3 className="text-xs font-bold uppercase tracking-[0.25em] text-white mb-5">
+                Fale com a F&amp;E
+              </h3>
+              
+              <div className="space-y-1.5 mb-4">
+                <a 
+                  href="mailto:feclean.higienizacao@gmail.com" 
+                  className="text-sm md:text-[15px] font-bold text-white hover:text-brand-blue transition-colors block break-all"
+                >
+                  feclean.higienizacao@gmail.com
+                </a>
+                <a 
+                  href="https://wa.me/5516920047362" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-brand-blue hover:text-blue-300 transition-colors font-semibold text-sm inline-flex items-center gap-1 group"
+                >
+                  <span>(16) 92004-7362</span>
+                  <ArrowUpRight size={15} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </a>
+              </div>
+
+              <div className="text-xs text-slate-400 leading-relaxed mb-6 space-y-0.5">
+                <p>Atendimento comercial e suporte</p>
+                <p>Ribeirão Preto · SP</p>
+              </div>
+
+              {/* Botões Circulares de Contato e Redes */}
+              <div className="flex items-center gap-3">
+                <a 
+                  href="https://wa.me/5516920047362" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  aria-label="WhatsApp"
+                  className="w-10 h-10 rounded-full border border-white/15 bg-white/[0.02] flex items-center justify-center text-slate-300 hover:text-white hover:border-brand-blue hover:bg-brand-blue/10 transition-all active:scale-95"
+                >
+                  <WhatsAppIcon size={18} />
+                </a>
+                <a 
+                  href="mailto:feclean.higienizacao@gmail.com" 
+                  aria-label="E-mail"
+                  className="w-10 h-10 rounded-full border border-white/15 bg-white/[0.02] flex items-center justify-center text-slate-300 hover:text-white hover:border-brand-blue hover:bg-brand-blue/10 transition-all active:scale-95"
+                >
+                  <Mail size={18} />
+                </a>
+                <a 
+                  href="https://instagram.com/feclean1" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  aria-label="Instagram"
+                  className="w-10 h-10 rounded-full border border-white/15 bg-white/[0.02] flex items-center justify-center text-slate-300 hover:text-white hover:border-brand-blue hover:bg-brand-blue/10 transition-all active:scale-95"
+                >
+                  <Instagram size={18} />
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+          {/* Sub-footer Inferior */}
+          <div className="pt-8 border-t border-white/[0.08] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 gap-y-2">
+              <p>© 2026 F&amp;E Clean. Todos os direitos reservados.</p>
+              <span className="text-slate-700 hidden sm:inline">•</span>
+              <a 
+                href="/lgpd.html" 
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                Política de Privacidade
+              </a>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <a 
+                href="https://lexionconsultoria.com.br" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-slate-400 hover:text-white transition-colors"
+              >
+                Desenvolvido pela Lexion Consultoria
+              </a>
+              <a
+                href="/admin/"
+                title="Acesso Restrito"
+                aria-label="Acesso Restrito"
+                className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-full hover:bg-white/10 opacity-70 hover:opacity-100 flex items-center justify-center border border-white/10"
+              >
+                <Lock size={12} />
+              </a>
+            </div>
+          </div>
         </div>
       </footer>
 

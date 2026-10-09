@@ -11,7 +11,7 @@ import {
   Menu,
   X,
   Instagram,
-  LayoutDashboard,
+  Lock,
   Phone,
   CheckCircle,
   ArrowRight,
@@ -289,12 +289,6 @@ function LandingPage() {
               <WhatsAppIcon size={14} />
               Orçamento
             </a>
-            <a
-              href="/admin/"
-              className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-slate-50 transition-all active:scale-95 flex items-center gap-2"
-            >
-              <LayoutDashboard size={14} className="text-slate-500" /> Admin
-            </a>
           </div>
 
           {/* Mobile Toggle */}
@@ -320,13 +314,6 @@ function LandingPage() {
               onClick={() => setIsMenuOpen(false)}
             >
               <WhatsAppIcon size={16} /> Solicitar Orçamento
-            </a>
-            <a
-              href="/admin/"
-              className="w-full py-4 bg-slate-100 text-slate-700 rounded-2xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-slate-200 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <LayoutDashboard size={16} /> Painel Admin
             </a>
           </div>
         )}
@@ -795,9 +782,19 @@ function LandingPage() {
         >
           Política de Privacidade
         </a>
-        <p className="text-slate-400">
-          Copyright © 2026 – F&E Clean Higienização de Estofados – Todos os direitos reservados
-        </p>
+        <div className="flex items-center justify-center gap-2 text-slate-400">
+          <p>
+            Copyright © 2026 – F&E Clean Higienização de Estofados – Todos os direitos reservados
+          </p>
+          <a
+            href="/admin/"
+            title="Acesso Restrito"
+            aria-label="Acesso Restrito"
+            className="text-slate-600 hover:text-slate-300 transition-colors p-1.5 rounded-full hover:bg-white/5 opacity-40 hover:opacity-100"
+          >
+            <Lock size={12} />
+          </a>
+        </div>
       </footer>
 
       {/* Floating WhatsApp Action Button */}

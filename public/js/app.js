@@ -1,13 +1,13 @@
-// Interface da Hiper Higienizações.
+// Interface do painel de gestão da F&E Clean.
 // Toda leitura vem de store.state e toda escrita passa pelas funções do
-// store.js, que decidem entre localStorage (demonstração) e Firestore (nuvem).
+// store.js, que gravam no Firestore.
 
 import { brl, dateFmt, fullDateFmt, monthFmt, localISO, parseDate, addDays, addMonths, startOfWeek, startOfMonth, uid, esc, phoneDigits, cap, whatsappLink, maskPhone, maskCep, maskCpf, maskCnpj, maskCurrency, parseCurrency } from './utils.js?v=2';
 import {
-  store, iniciar, entrarComGoogle, sair, irParaLogin,
+  store, iniciar, entrarComGoogle, sair, ehMestre,
   criar, atualizar, remover, gravarLote, aoMudar, aoErro, mensagemErro,
   listarAutorizados, adicionarAutorizado, removerAutorizado
-} from './store.js';
+} from './store.js?v=2';
 import {
   suportaNotificacoes, permissaoAtual, pedirPermissao,
   publicarLembretes, verificarAgora, registrarPeriodicSync, periodicSyncAtivo
@@ -392,7 +392,7 @@ function renderOrders() {
 }
 
 function renderAll() {
-  if (store.modo !== 'demo' && store.modo !== 'nuvem') return;
+  if (store.modo !== 'nuvem') return;
   renderDashboard(); renderAgenda(); renderClients(); renderServices(); renderFinance(); renderOrders();
   bindDynamicActions();
 }
@@ -1017,7 +1017,7 @@ function renderAuth() {
   const app = document.querySelector('.app-shell');
   const carregando = store.modo === 'carregando';
   const semAcesso = store.modo === 'sem-acesso';
-  const logado = store.modo === 'demo' || store.modo === 'nuvem';
+  const logado = store.modo === 'nuvem';
   tela.hidden = logado;
   app.hidden = !logado;
   document.getElementById('authLoading').hidden = !carregando;
@@ -1026,16 +1026,12 @@ function renderAuth() {
   if (semAcesso) document.getElementById('deniedEmail').textContent = store.usuario?.email || '-';
   if (!logado) return;
 
-  // Cabeçalho e configurações refletem o modo em uso.
-  const demo = store.modo === 'demo';
   renderNetworkBadge();
-  const demoPanel = document.getElementById('demoPanel');
-  if (demoPanel) demoPanel.hidden = !demo;
-  const cloudPanel = document.getElementById('cloudPanel');
-  if (cloudPanel) cloudPanel.hidden = demo;
   document.getElementById('accountEmail').textContent = store.usuario?.email || '-';
   document.getElementById('accountName').textContent = store.usuario?.displayName || 'Sem nome definido';
-  renderProfile(demo);
+  // Só as contas mestre gerenciam quem tem acesso (garantido em firestore.rules).
+  document.getElementById('btnAddAuthorized').hidden = !ehMestre(store.usuario?.email);
+  renderProfile();
 }
 
 function profileInitials(name, email) {
@@ -1044,10 +1040,10 @@ function profileInitials(name, email) {
   return String(email || 'FE').slice(0, 2).toUpperCase();
 }
 
-function renderProfile(demo) {
-  const name = demo ? 'Equipe F&E Clean (Local)' : store.usuario?.displayName || 'Equipe F&E Clean';
-  const email = demo ? 'feclean.higienizacao@gmail.com' : store.usuario?.email || 'feclean.higienizacao@gmail.com';
-  const photoURL = demo ? '' : store.usuario?.photoURL || '';
+function renderProfile() {
+  const name = store.usuario?.displayName || 'Equipe F&E Clean';
+  const email = store.usuario?.email || 'feclean.higienizacao@gmail.com';
+  const photoURL = store.usuario?.photoURL || '';
   const initials = profileInitials(name, email);
 
   document.getElementById('profileName').textContent = name;
@@ -1090,6 +1086,7 @@ async function renderAuthorizedUsers() {
   container.innerHTML = '<div style="font-size:12px; color:var(--muted); padding:4px 0;"><i class="fa-solid fa-spinner fa-spin"></i> Carregando autorizados...</div>';
   try {
     const lista = await listarAutorizados();
+    const podeGerenciar = ehMestre(store.usuario?.email);
     if (!lista.length) {
       container.innerHTML = '<div style="font-size:12px; color:var(--muted); padding:4px 0;">Nenhum usuário cadastrado.</div>';
       return;
@@ -1101,7 +1098,7 @@ async function renderAuthorizedUsers() {
           <span style="font-size:11px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${esc(item.email)}</span>
         </div>
         <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
-          ${item.mestre ? '<span class="badge scheduled" style="font-size:10px;">Admin Mestre</span>' : `
+          ${item.mestre ? '<span class="badge scheduled" style="font-size:10px;">Admin Mestre</span>' : !podeGerenciar ? '' : `
             <button type="button" class="icon-button" data-remove-authorized="${esc(item.email)}" title="Revogar acesso" style="width:28px; height:28px; color:var(--danger); border-radius:8px;">
               <i class="fa-solid fa-trash-can" style="font-size:12px;"></i>
             </button>
@@ -1409,10 +1406,6 @@ window.addEventListener('focus', () => {
   }
 });
 
-// document.getElementById('resetDemo').addEventListener('click', () => {
-//   if (confirm('Restaurar os dados demonstrativos e apagar alterações locais?')) { restaurarDemo(); toast('Demonstração restaurada.'); }
-// });
-// document.getElementById('goToLogin').addEventListener('click', irParaLogin);
 async function confirmarSaida() {
   if (confirm('Sair da conta?')) await comFeedback(() => sair());
 }
@@ -1438,36 +1431,6 @@ document.getElementById('btnAddAuthorized')?.addEventListener('click', async () 
   }
 });
 
-document.querySelectorAll('[data-service-choice]').forEach(link => link.addEventListener('click', () => {
-  const select = document.getElementById('landingServiceSelect');
-  select.value = link.dataset.serviceChoice;
-}));
-
-const landingDate = document.getElementById('landingPreferredDate');
-if (landingDate) landingDate.min = localISO(new Date());
-
-document.getElementById('landingQuoteForm')?.addEventListener('submit', event => {
-  event.preventDefault();
-  const data = new FormData(event.currentTarget);
-  const date = data.get('preferredDate');
-  const period = data.get('period');
-  const periodText = { 'Manhã':'pela manhã', 'Tarde':'à tarde', 'Qualquer período':'em qualquer período' }[period] || '';
-  const preference = date
-    ? `${dateFmt.format(parseDate(date))}${periodText ? `, ${periodText}` : ''}`
-    : periodText ? `${cap(periodText)}, em data a combinar` : 'Data e período a combinar';
-  const message = [
-    'Olá! Quero solicitar um orçamento na F&E Clean.',
-    '',
-    `*Nome:* ${data.get('name')}`,
-    `*WhatsApp:* ${data.get('phone')}`,
-    `*Serviço:* ${data.get('service')}`,
-    `*Local:* ${data.get('neighborhood')} — ${data.get('city')}`,
-    `*Peça / necessidade:* ${data.get('details')}`,
-    `*Preferência de atendimento:* ${preference}`
-  ].join('\n');
-  window.open(`https://wa.me/5516920047362?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer');
-});
-
 document.getElementById('copyClientLink')?.addEventListener('click', () => {
   const empresaUid = store.empresaUid;
   if (!store.usuario || !empresaUid) {
@@ -1488,7 +1451,7 @@ function shareClientRegistrationLink() {
   }
   const url = `${window.location.origin}/cadastro.html?u=${empresaUid}`;
   const text = encodeURIComponent(`Olá! Por favor, preencha seu cadastro para podermos agendar o seu serviço na F&E Clean:\n${url}`);
-  window.open(`https://wa.me/?text=${text}`, '_blank');
+  window.open(`https://wa.me/?text=${text}`, '_blank', 'noopener,noreferrer');
 }
 
 document.getElementById('shareClientLinkButton')?.addEventListener('click', shareClientRegistrationLink);
@@ -1543,11 +1506,6 @@ document.addEventListener('visibilitychange', () => {
 
 /* ------------------------------------------------------------- Arranque -- */
 
-
-
-// Exposto para inspeção no console do navegador e para os testes headless.
-window.__store = store;
-
 aoMudar(() => {
   renderAuth();
   renderAll();
@@ -1556,27 +1514,18 @@ aoMudar(() => {
   renderAppPanel();
   maybeOpenGuide();
   // Mantém o resumo que o service worker lê para lembrar dos serviços do dia.
-  if (store.modo === 'demo' || store.modo === 'nuvem') {
+  if (store.modo === 'nuvem') {
     publicarLembretes(state(), id => clientName(getClient(id)));
   }
 });
 aoErro(mensagem => toast(mensagem));
 
-// Sem firebase-config.js preenchido não existe nuvem: some com o que leva ao
-// login e explica o porquê, na tela de acesso e nas configurações.
-if (store.configPendente) {
-  document.getElementById('configWarning').hidden = false;
-  document.getElementById('configHint').hidden = false;
-  document.getElementById('authEntrar').hidden = true;
-//  document.getElementById('goToLogin').hidden = true;
-}
-
-// Pinta o "Verificando acesso..." antes de iniciar: com o Firebase configurado,
-// o carregamento do SDK acontece entre este ponto e o primeiro aoMudar().
+// Pinta o "Verificando acesso..." antes de iniciar: o carregamento do SDK
+// acontece entre este ponto e o primeiro aoMudar().
 renderAuth();
 
 // Se o SDK não carregar (CDN bloqueado, sem rede), o app não pode ficar preso
-// na tela de carregamento: cai para o login com o aviso e a opção de demonstrar.
+// na tela de carregamento: cai para o login com o aviso.
 iniciar().catch(error => {
   store.modo = 'deslogado';
   renderAuth();
@@ -1834,6 +1783,25 @@ async function saveOsData() {
   }
 }
 
+// html-to-image e jsPDF somam ~440 KB: só são baixados quando a OS vira PDF.
+// O service worker já os guarda no cache, então funcionam offline.
+let bibliotecasPdf = null;
+function carregarScript(src) {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = resolve;
+    script.onerror = () => reject(new Error(`Falha ao carregar ${src}`));
+    document.head.appendChild(script);
+  });
+}
+function carregarBibliotecasPdf() {
+  if (window.htmlToImage && window.jspdf) return Promise.resolve();
+  bibliotecasPdf ??= Promise.all([carregarScript('/js/html-to-image.js'), carregarScript('/js/jspdf.umd.min.js')])
+    .catch(error => { bibliotecasPdf = null; throw error; });
+  return bibliotecasPdf;
+}
+
 async function generateOsPdfInstance() {
   const osElement = document.getElementById('osPrintableDoc');
   if (!osElement) return null;
@@ -1841,10 +1809,7 @@ async function generateOsPdfInstance() {
   const clientName = document.getElementById('osFieldClientName')?.value.trim() || 'Cliente';
   const osNum = document.getElementById('osDocBadgeNumber')?.textContent.replace('#', '').trim() || '0000';
 
-  if (!window.htmlToImage || !window.jspdf) {
-    toast('Carregando bibliotecas...');
-    await new Promise(r => setTimeout(r, 400));
-  }
+  await carregarBibliotecasPdf();
 
   // Sincroniza valores de formulário nos atributos para renderização perfeita
   osElement.querySelectorAll('input[type="checkbox"], input[type="radio"]').forEach(input => {

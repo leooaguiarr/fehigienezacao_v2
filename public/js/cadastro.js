@@ -111,9 +111,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('loadingOverlay').style.display = 'flex';
     
     try {
-      // Lazy load Firebase ONLY on submit
-      const { initializeApp } = await import(`${SDK}/firebase-app.js`);
-      const { getFirestore, collection, addDoc, serverTimestamp } = await import(`${SDK}/firebase-firestore.js`);
+      // O Firebase só é baixado no envio; a versão lite basta para um addDoc.
+      const [{ initializeApp }, { getFirestore, collection, addDoc, serverTimestamp }] = await Promise.all([
+        import(`${SDK}/firebase-app.js`),
+        import(`${SDK}/firebase-firestore-lite.js`)
+      ]);
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
@@ -122,7 +124,7 @@ document.addEventListener('DOMContentLoaded', () => {
         firstName: document.getElementById('clientFirstName').value.trim(),
         lastName: document.getElementById('clientLastName').value.trim(),
         phone: document.getElementById('clientPhone').value.trim(),
-        documentType: docType ? docType.value : 'cpf',
+        documentType: docType && docType.value === 'cnpj' ? 'cnpj' : 'cpf',
         document: docInput ? docInput.value.trim() : '',
         cep: document.getElementById('clientZip').value.trim(),
         address: document.getElementById('clientStreet').value.trim(),

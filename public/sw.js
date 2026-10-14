@@ -7,23 +7,22 @@
 // Suba a VERSAO a cada alteração de arquivo estático: o cache antigo é
 // descartado no activate.
 
-const VERSAO = 'feclean-v48';
+const VERSAO = 'feclean-v49';
 const CACHE_APP = `${VERSAO}-app`;
 const CACHE_EXTERNO = `${VERSAO}-externo`;
 const CACHE_DADOS = 'feclean-dados';
 const CHAVE_LEMBRETES = '/__lembretes';
 
-// Arquivos próprios, suficientes para a interface abrir offline.
+// Arquivos próprios, suficientes para a interface abrir offline. As URLs
+// precisam bater exatamente com as usadas nos HTMLs (inclusive o ?v=).
 const APP_SHELL = [
   '/',
   '/index.html',
   '/admin/',
   '/admin/index.html',
-  '/admin.html',
-  '/css/app.css?v=32',
-  '/js/app.js?v=40',
-  '/js/store.js',
-  '/js/seed.js',
+  '/css/app.css?v=33',
+  '/js/app.js?v=41',
+  '/js/store.js?v=2',
   '/js/utils.js?v=2',
   '/js/notificacoes.js',
   '/js/firebase-config.js',
@@ -31,7 +30,7 @@ const APP_SHELL = [
   '/js/jspdf.umd.min.js',
   '/cadastro.html',
   '/lgpd.html',
-  '/js/cadastro.js?v=3',
+  '/js/cadastro.js?v=5',
   '/manifest.webmanifest',
   '/favicon.png',
   '/favicon.ico',
@@ -39,11 +38,8 @@ const APP_SHELL = [
   '/icon-512.png',
   '/icon-maskable-512.png',
   '/apple-touch-icon.png',
-  '/assets/logo-feclean.png',
-  '/assets/icon-192.png',
-  '/assets/icon-512.png',
-  '/assets/icon-maskable-512.png',
-  '/assets/apple-touch-icon.png'
+  '/img/logo-feclean.webp',
+  '/img/login-hero.webp'
 ];
 
 // Hosts de terceiros que valem cachear: SDK, fontes e ícones.
@@ -158,8 +154,8 @@ async function verificarLembretes() {
     const corpo = doDia.slice(0, 3).map(item => `${item.time} · ${item.tipo === 'devolucao' ? 'Devolução · ' : ''}${item.cliente}`).join('\n');
     await self.registration.showNotification(titulo, {
       body: corpo,
-      icon: '/assets/icon-192.png',
-      badge: '/assets/icon-192.png',
+      icon: '/icon-192.png',
+      badge: '/icon-192.png',
       tag: 'feclean-agenda-do-dia',
       renotify: false,
       data: { url: '/admin/?tela=agenda' }
@@ -182,8 +178,8 @@ async function verificarLembretes() {
       devolucao ? `Devolução às ${item.time}` : `Atendimento às ${item.time}`,
       {
         body: `${item.cliente}${item.endereco ? ` · ${item.endereco}` : ''}`,
-        icon: '/assets/icon-192.png',
-        badge: '/assets/icon-192.png',
+        icon: '/icon-192.png',
+        badge: '/icon-192.png',
         tag: `feclean-horario-${item.id}`,
         renotify: false,
         data: { url: '/admin/?tela=agenda' }

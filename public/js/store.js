@@ -1,20 +1,13 @@
-// Camada de dados da Hiper Higienizações.
+// Camada de dados da F&E Clean.
 //
-// Opera em dois modos, expostos pela mesma API para a interface:
-//
-//   'demo'  - dados demonstrativos guardados em localStorage, sem login.
-//   'nuvem' - dados compartilhados da Hiper no Firestore, em tempo real.
-//
-// Em ambos os modos a interface só chama criar/atualizar/remover e escuta
-// aoMudar(). O SDK do Firebase é carregado sob demanda: em modo demonstração
-// nenhuma requisição ao Firebase acontece.
+// A interface só chama criar/atualizar/remover/gravarLote e escuta aoMudar().
+// Os dados ficam no Firestore, em usuarios/{EMPRESA_UID}/..., e só contas
+// Google autorizadas os leem ou gravam (veja firestore.rules).
 
-import { firebaseConfig, configPendente } from './firebase-config.js';
-import { seedData, SERVICOS_PADRAO } from './seed.js';
-import { uid } from './utils.js';
+import { firebaseConfig } from './firebase-config.js';
+import { uid } from './utils.js?v=2';
 
 const SDK = 'https://www.gstatic.com/firebasejs/12.9.0';
-const STORAGE_KEY = 'feclean-gestao-v1';
 const MODO_KEY = 'feclean-modo';
 export const EMPRESA_UID = 'feclean-oficial';
 
@@ -35,11 +28,11 @@ let notificar = () => {};
 let notificarErro = () => {};
 
 export const store = {
+  // 'carregando' | 'deslogado' | 'sem-acesso' | 'nuvem'
   modo: 'carregando',
   usuario: null,
   empresaUid: EMPRESA_UID,
   state: estadoVazio(),
-  configPendente,
   // Sincronização: 'doCache' indica que os dados vieram do cache local e
   // 'pendentes' que há gravações ainda não confirmadas pelo servidor.
   doCache: false,
@@ -91,7 +84,7 @@ const ERROS = {
   'auth/requires-recent-login': 'Por segurança, entre novamente para concluir.',
   'auth/invalid-api-key': 'Chave de API inválida. Revise o firebase-config.js.',
   'auth/api-key-not-valid.-please-pass-a-valid-api-key.': 'Chave de API inválida. Revise o firebase-config.js.',
-  'permission-denied': 'Sem permissão para este dado. Confira as regras do Firestore.',
+  'permission-denied': 'Sem permissão para esta ação.',
   'unavailable': 'Sem conexão com o Firestore. Tentaremos novamente.',
   'failed-precondition': 'O Firestore ainda não foi criado no console do Firebase.',
   'not-found': 'Registro não encontrado. Ele pode ter sido removido.'
@@ -101,9 +94,8 @@ export function mensagemErro(error) {
   if (ERROS[codigo]) return ERROS[codigo];
   // O SDK devolve mensagens como "Firebase: Error (auth/algo-assim)." Sem
   // tradução própria, ao menos mostramos o código sem o ruído em volta.
-  const bruta = (error && error.message) || '';
-  if (codigo) return `Falha no Firebase (${codigo}). Confira docs/FIREBASE_SETUP.md.`;
-  return bruta || 'Não foi possível concluir a operação.';
+  if (codigo) return `Falha no Firebase (${codigo}).`;
+  return (error && error.message) || 'Não foi possível concluir a operação.';
 }
 
 /* -------------------------------------------------------------- Sessão -- */
@@ -111,47 +103,45 @@ export function mensagemErro(error) {
 export function aoMudar(callback) { notificar = callback; }
 export function aoErro(callback) { notificarErro = callback; }
 
-// Observa o login e decide o modo de operação na abertura do app.
+function limparSessao(modo) {
+  pararEscuta();
+  store.modo = modo;
+  store.state = estadoVazio();
+  try { localStorage.removeItem(MODO_KEY); } catch {}
+}
+
+// Observa o login e decide o que mostrar na abertura do app.
 export async function iniciar() {
-  // Limpeza de rastros de demonstração antigos e autenticações legadas por senha
+  // Remove rastros de versões antigas (modo demonstração e login por senha).
   try {
-    localStorage.removeItem('feclean-gestao-v1');
-    localStorage.removeItem('hiper-gestao-v1');
-    localStorage.removeItem('feclean-auth-team');
-    if (localStorage.getItem(MODO_KEY) === 'demo') {
-      localStorage.removeItem(MODO_KEY);
-    }
+    ['feclean-gestao-v1', 'hiper-gestao-v1', 'feclean-auth-team'].forEach(chave => localStorage.removeItem(chave));
+    if (localStorage.getItem(MODO_KEY) === 'demo') localStorage.removeItem(MODO_KEY);
   } catch {}
 
   const { auth, authApi } = await carregarSDK();
   authApi.onAuthStateChanged(auth, async usuario => {
-    if (usuario) {
-      store.usuario = usuario;
-      let liberado = false;
-      try {
-        liberado = await verificarAutorizacao(usuario.email);
-      } catch (error) {
-        console.error('Erro na validação de autorização:', error);
-        notificarErro(mensagemErro(error));
-      }
-      if (!liberado) {
-        pararEscuta();
-        store.modo = 'sem-acesso';
-        store.state = estadoVazio();
-        localStorage.removeItem(MODO_KEY);
-        notificar();
-        return;
-      }
-      store.modo = 'nuvem';
-      localStorage.setItem(MODO_KEY, 'nuvem');
-      await escutarColecoes();
-    } else {
-      pararEscuta();
+    if (!usuario) {
       store.usuario = null;
-      store.modo = 'deslogado';
-      store.state = estadoVazio();
-      localStorage.removeItem(MODO_KEY);
+      limparSessao('deslogado');
+      notificar();
+      return;
     }
+    store.usuario = usuario;
+    let liberado = false;
+    try {
+      liberado = await verificarAutorizacao(usuario.email);
+    } catch (error) {
+      console.error('Erro na validação de autorização:', error);
+      notificarErro(mensagemErro(error));
+    }
+    if (!liberado) {
+      limparSessao('sem-acesso');
+      notificar();
+      return;
+    }
+    store.modo = 'nuvem';
+    try { localStorage.setItem(MODO_KEY, 'nuvem'); } catch {}
+    await escutarColecoes();
     notificar();
   });
 }
@@ -171,30 +161,26 @@ export async function entrarComGoogle() {
   }
 }
 
-// Lista mestre com permissão irrestrita permanente
+// Contas com acesso permanente. A mesma lista existe em firestore.rules, que
+// é quem de fato garante o acesso: mantenha as duas iguais.
 const AUTORIZADOS_MESTRES = [
   'feclean.higienizacao@gmail.com',
   'leooaguiarr@gmail.com'
 ];
 
-// Autenticar no Google não é o mesmo que ter acesso ao sistema:
-// a liberação vem exclusivamente da lista Firestore `autorizados/{email}`.
+export const ehMestre = email => AUTORIZADOS_MESTRES.includes(String(email || '').trim().toLowerCase());
+
+// Autenticar no Google não é o mesmo que ter acesso ao sistema: além das
+// contas mestre, a liberação vem da lista Firestore `autorizados/{email}`.
 async function verificarAutorizacao(email) {
   if (!email) return false;
   const emailNorm = String(email).trim().toLowerCase();
-
-  // Contas mestre sempre autorizadas
-  if (AUTORIZADOS_MESTRES.includes(emailNorm)) return true;
+  if (ehMestre(emailNorm)) return true;
 
   try {
     const { db, dbApi } = await carregarSDK();
     const registro = await dbApi.getDoc(dbApi.doc(db, 'autorizados', emailNorm));
-    if (registro.exists()) {
-      const dados = registro.data() || {};
-      if (dados.ativo === false) return false;
-      return true;
-    }
-    return false;
+    return registro.exists() && (registro.data() || {}).ativo !== false;
   } catch (err) {
     console.warn('Erro ao consultar lista de autorizados no Firestore:', err);
     return false;
@@ -206,7 +192,6 @@ export async function listarAutorizados() {
   const snapshot = await dbApi.getDocs(dbApi.collection(db, 'autorizados'));
   const mapa = new Map();
 
-  // Inclui as contas mestres por padrão
   AUTORIZADOS_MESTRES.forEach(email => {
     mapa.set(email, { email, nome: 'Administrador Principal', ativo: true, mestre: true });
   });
@@ -215,11 +200,11 @@ export async function listarAutorizados() {
     const data = docSnap.data() || {};
     const email = docSnap.id.toLowerCase();
     mapa.set(email, {
+      ...data,
       email,
       nome: data.nome || 'Membro da Equipe',
       ativo: data.ativo !== false,
-      mestre: AUTORIZADOS_MESTRES.includes(email),
-      ...data
+      mestre: ehMestre(email)
     });
   });
 
@@ -229,13 +214,13 @@ export async function listarAutorizados() {
 export async function adicionarAutorizado(email, nome = '') {
   if (!email) throw new Error('E-mail é obrigatório.');
   const emailNorm = String(email).trim().toLowerCase();
-  if (!emailNorm.includes('@') || !emailNorm.includes('.')) {
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailNorm)) {
     throw new Error('E-mail inválido.');
   }
   const { db, dbApi } = await carregarSDK();
   await dbApi.setDoc(dbApi.doc(db, 'autorizados', emailNorm), {
     email: emailNorm,
-    nome: nome.trim() || 'Membro da Equipe',
+    nome: String(nome).trim().slice(0, 80) || 'Membro da Equipe',
     ativo: true,
     cadastradoEm: new Date().toISOString()
   }, { merge: true });
@@ -244,7 +229,7 @@ export async function adicionarAutorizado(email, nome = '') {
 export async function removerAutorizado(email) {
   if (!email) return;
   const emailNorm = String(email).trim().toLowerCase();
-  if (AUTORIZADOS_MESTRES.includes(emailNorm)) {
+  if (ehMestre(emailNorm)) {
     throw new Error('Não é possível remover a conta de administrador mestre.');
   }
   const { db, dbApi } = await carregarSDK();
@@ -252,149 +237,80 @@ export async function removerAutorizado(email) {
 }
 
 export async function sair() {
-  localStorage.removeItem(MODO_KEY);
-  localStorage.removeItem('feclean-auth-team');
-  localStorage.removeItem(STORAGE_KEY);
-  pararEscuta();
-  store.modo = 'deslogado';
   store.usuario = null;
-  store.state = estadoVazio();
+  limparSessao('deslogado');
   if (fb?.authApi && fb?.auth) {
     await fb.authApi.signOut(fb.auth).catch(() => {});
   }
   notificar();
 }
 
-export function irParaLogin() {
-  localStorage.removeItem(MODO_KEY);
-  localStorage.removeItem('feclean-auth-team');
-  localStorage.removeItem(STORAGE_KEY);
-  pararEscuta();
-  store.modo = 'deslogado';
-  store.usuario = null;
-  store.state = estadoVazio();
-  notificar();
-}
-
 /* ------------------------------------------------------------- Leitura -- */
-
-function carregarLocal() {
-  return estadoVazio();
-}
-function salvarLocal() {
-  // Em produção, os dados vão direto para o Firestore
-}
 
 function pararEscuta() { ouvintes.forEach(cancelar => cancelar()); ouvintes = []; }
 
-// Assina as coleções compartilhadas da Hiper. Todas as contas liberadas usam
-// o mesmo caminho; o e-mail autorizado determina quem pode acessar a base.
+// Assina as coleções da empresa. Todas as contas liberadas usam o mesmo
+// caminho; as regras do Firestore decidem quem pode ler.
 async function escutarColecoes() {
   pararEscuta();
   const { db, dbApi } = await carregarSDK();
   store.state = estadoVazio();
-  let semeado = false;
   const cacheDe = {};
   const pendentesDe = {};
   Object.entries(COLECOES).forEach(([chave, nome]) => {
     const referencia = dbApi.collection(db, 'usuarios', EMPRESA_UID, nome);
-    const cancelar = dbApi.onSnapshot(referencia, { includeMetadataChanges: true }, async snapshot => {
+    const cancelar = dbApi.onSnapshot(referencia, { includeMetadataChanges: true }, snapshot => {
       store.state[chave] = snapshot.docs.map(documento => ({ id: documento.id, ...documento.data() }));
       cacheDe[chave] = snapshot.metadata.fromCache;
       pendentesDe[chave] = snapshot.metadata.hasPendingWrites;
       store.doCache = Object.values(cacheDe).some(Boolean);
       store.pendentes = Object.values(pendentesDe).some(Boolean);
-      // Removemos o auto-seed para permitir que a base fique vazia
-      // (caso o usuário exclua todos os serviços para recomeçar).
       notificar();
     }, error => notificarErro(mensagemErro(error)));
     ouvintes.push(cancelar);
   });
 }
 
-async function semearServicos() {
-  const { db, dbApi } = await carregarSDK();
-  const lote = dbApi.writeBatch(db);
-  const padrao = seedData();
-  
-  padrao.services.forEach(servico => {
-    const { id, ...dados } = servico;
-    lote.set(dbApi.doc(db, 'usuarios', EMPRESA_UID, 'servicos', id), dados);
-  });
-  
-  padrao.settings.forEach(config => {
-    const { id, ...dados } = config;
-    lote.set(dbApi.doc(db, 'usuarios', EMPRESA_UID, 'configuracoes', id), dados);
-  });
-  
-  await lote.commit();
-}
-
 /* ------------------------------------------------------------- Escrita -- */
 
-function referenciaDoc(chave, id) {
-  return fb.dbApi.doc(fb.db, 'usuarios', EMPRESA_UID, COLECOES[chave], id);
+// O Firestore rejeita campos com valor undefined; eles são descartados aqui.
+function semIndefinidos(dados) {
+  return Object.fromEntries(Object.entries(dados).filter(([, valor]) => valor !== undefined));
+}
+
+async function referenciaDoc(chave, id) {
+  const { db, dbApi } = await carregarSDK();
+  return dbApi.doc(db, 'usuarios', EMPRESA_UID, COLECOES[chave], id);
 }
 
 export async function criar(chave, dados) {
   const registro = { id: dados.id || uid(chave.slice(0, 3)), ...dados };
-  if (store.modo === 'nuvem') {
-    await carregarSDK();
-    const { id, ...corpo } = registro;
-    await fb.dbApi.setDoc(referenciaDoc(chave, id), corpo);
-    return registro;
-  }
-  store.state[chave].push(registro);
-  salvarLocal(); notificar();
+  const { id, ...corpo } = registro;
+  const referencia = await referenciaDoc(chave, id);
+  await fb.dbApi.setDoc(referencia, semIndefinidos(corpo));
   return registro;
 }
 
 export async function atualizar(chave, id, patch) {
-  if (store.modo === 'nuvem') {
-    await carregarSDK();
-    await fb.dbApi.updateDoc(referenciaDoc(chave, id), patch);
-    return;
-  }
-  const registro = store.state[chave].find(item => item.id === id);
-  if (registro) Object.assign(registro, patch);
-  salvarLocal(); notificar();
+  const referencia = await referenciaDoc(chave, id);
+  await fb.dbApi.updateDoc(referencia, semIndefinidos(patch));
 }
 
 export async function remover(chave, id) {
-  if (store.modo === 'nuvem') {
-    await carregarSDK();
-    await fb.dbApi.deleteDoc(referenciaDoc(chave, id));
-    return;
-  }
-  store.state[chave] = store.state[chave].filter(item => item.id !== id);
-  salvarLocal(); notificar();
+  const referencia = await referenciaDoc(chave, id);
+  await fb.dbApi.deleteDoc(referencia);
 }
 
 // Grava várias operações de uma vez (usado ao concluir uma OS, que atualiza o
 // agendamento, o cliente e cria a receita no mesmo gesto).
 export async function gravarLote(operacoes) {
-  if (store.modo === 'nuvem') {
-    await carregarSDK();
-    const lote = fb.dbApi.writeBatch(fb.db);
-    operacoes.forEach(({ tipo, chave, id, dados }) => {
-      const referencia = referenciaDoc(chave, id);
-      if (tipo === 'criar') { const { id: descartado, ...corpo } = dados; lote.set(referencia, corpo); }
-      else if (tipo === 'atualizar') lote.update(referencia, dados);
-      else if (tipo === 'remover') lote.delete(referencia);
-    });
-    await lote.commit();
-    return;
+  const { db, dbApi } = await carregarSDK();
+  const lote = dbApi.writeBatch(db);
+  for (const { tipo, chave, id, dados } of operacoes) {
+    const referencia = await referenciaDoc(chave, id);
+    if (tipo === 'criar') { const { id: _descartado, ...corpo } = dados; lote.set(referencia, semIndefinidos(corpo)); }
+    else if (tipo === 'atualizar') lote.update(referencia, semIndefinidos(dados));
+    else if (tipo === 'remover') lote.delete(referencia);
   }
-  operacoes.forEach(({ tipo, chave, id, dados }) => {
-    if (tipo === 'criar') store.state[chave].push({ id, ...dados });
-    else if (tipo === 'atualizar') {
-      const registro = store.state[chave].find(item => item.id === id);
-      if (registro) Object.assign(registro, dados);
-    } else if (tipo === 'remover') store.state[chave] = store.state[chave].filter(item => item.id !== id);
-  });
-  salvarLocal(); notificar();
-}
-
-export function restaurarDemo() {
-  // Desativado em produção
+  await lote.commit();
 }

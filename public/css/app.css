@@ -749,9 +749,9 @@ td.expense { color: var(--danger); font-weight: 800; }
 .auth-demo .secondary-button { width: 100%; padding: 12px; font-size: 14px; }
 .auth-demo small { color: var(--muted); font-size: 12px; line-height: 1.45; }
 
-/* ---------------------------------------- Acesso institucional da Hiper -- */
+/* -------------------------------------------- Tela de acesso do painel -- */
 .auth-screen { grid-template-columns: minmax(0, 1.7fr) minmax(430px, .72fr); place-items: stretch; min-height: 100svh; padding: 0; overflow: hidden; background: #040d1e; }
-.auth-visual { position: relative; min-width: 0; overflow: hidden; background: #071a35 url('/assets/login-hiper-hero.png') center center / cover no-repeat; isolation: isolate; }
+.auth-visual { position: relative; min-width: 0; overflow: hidden; background: #071a35 url('/img/login-hero.webp') center center / cover no-repeat; isolation: isolate; }
 .auth-visual::before { position: absolute; z-index: 0; inset: 0; content: ''; background: linear-gradient(180deg, rgba(3,13,31,.17) 0%, rgba(3,13,31,.04) 40%, rgba(3,13,31,.9) 100%); }
 .auth-visual::after { position: absolute; z-index: 0; top: 0; right: -1px; bottom: 0; width: 30%; content: ''; background: linear-gradient(90deg, transparent, rgba(4,13,30,.55) 58%, #040d1e 100%); }
 .auth-visual-brand { position: absolute; z-index: 1; top: 40px; left: 46px; display: flex; align-items: center; gap: 12px; color: #fff; }

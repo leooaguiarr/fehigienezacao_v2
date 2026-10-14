@@ -1,21 +1,10 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useRef } from 'react';
 import { motion } from 'motion/react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import {
-  MessageCircle,
   Menu,
   X,
   Instagram,
   Lock,
-  Phone,
-  CheckCircle,
-  ArrowRight,
-  MapPin,
   Mail,
   ChevronDown,
   ChevronUp,
@@ -27,89 +16,24 @@ import {
   ArrowUpRight
 } from 'lucide-react';
 
-import fotoSofaMetade from './foto_sofa_metade.jpg';
-import fotoCadeira from './foto_cadeira.jpg';
-import fotoSofaExtratora1 from './foto_sofa_extratora1.png';
-import fotoCarro from './foto_carro.png';
-import foto2 from './foto_2.png';
-import foto7 from './foto_7.png';
-import resultadoNovo1 from './resultado_novo_1.png';
-import resultadoNovo2 from './resultado_novo_2.png';
-import resultadoColchaoClean from './resultado_colchao_clean.png';
-import fundoSite from './fundo_site.png';
-import fundoVideo from './Cinematic_background_video_for.mp4';
-import logo from './logo_sem_fundo.png';
+import fotoSofaMetade from './assets/foto_sofa_metade.webp';
+import fotoCadeira from './assets/foto_cadeira.webp';
+import fotoSofaExtratora1 from './assets/foto_sofa_extratora1.webp';
+import fotoCarro from './assets/foto_carro.webp';
+import foto2 from './assets/foto_2.webp';
+import foto7 from './assets/foto_7.webp';
+import resultadoNovo1 from './assets/resultado_novo_1.webp';
+import resultadoNovo2 from './assets/resultado_novo_2.webp';
+import fundoVideo from './assets/hero-video.mp4';
+import fundoPoster from './assets/hero-poster.webp';
+import logo from './assets/logo.webp';
 
-import AdminLogin from './components/admin/AdminLogin';
-import AdminPanel from './components/admin/AdminPanel';
-import { saveContactMessage } from './lib/db';
-
-export default function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/admin" element={<AdminRedirect />} />
-        <Route path="/admin/*" element={<AdminRedirect />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
-
-function AdminRedirect() {
-  React.useEffect(() => {
-    window.location.replace('/admin/index.html');
-  }, []);
-  return null;
-}
-
-function AdminRoutes() {
-  const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem('adminAuth') === 'true');
-  const navigate = useNavigate();
-
-  if (!isAuthenticated) {
-    return (
-      <Routes>
-        <Route path="login" element={
-          <div className="min-h-screen font-sans text-white selection:bg-gold/20 bg-[#050810] relative">
-            <div className="fixed inset-0 pointer-events-none z-0">
-              <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gold/8 rounded-full blur-[180px]" />
-              <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gold-light/5 rounded-full blur-[150px]" />
-            </div>
-            <AdminLogin 
-              onLogin={() => {
-                sessionStorage.setItem('adminAuth', 'true');
-                setIsAuthenticated(true);
-                navigate('/admin/dashboard');
-              }} 
-              onBack={() => { window.location.href = '/'; }} 
-            />
-          </div>
-        } />
-        <Route path="*" element={<Navigate to="/admin/login" replace />} />
-      </Routes>
-    );
-  }
-
-  return (
-    <div className="min-h-screen font-sans text-white selection:bg-gold/20 bg-[#050810] relative">
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-gold/8 rounded-full blur-[180px]" />
-        <div className="absolute bottom-1/4 right-0 w-[500px] h-[500px] bg-gold-light/5 rounded-full blur-[150px]" />
-      </div>
-      <AdminPanel onLogout={() => {
-        sessionStorage.removeItem('adminAuth');
-        setIsAuthenticated(false);
-        navigate('/admin/login');
-      }} />
-    </div>
-  );
-}
+import { salvarMensagemContato } from './lib/contato';
 
 /* ─── Service Card Data ─── */
 const services = [
   { title: 'HIGIENIZAÇÃO\nDE SOFÁ', img: fotoSofaMetade },
-  { title: 'HIGIENIZAÇÃO\nDE COLCHÕES', img: resultadoColchaoClean },
+  { title: 'HIGIENIZAÇÃO\nDE COLCHÕES', img: resultadoNovo2 },
   { title: 'IMPERMEABILIZAÇÃO\nDE ESTOFADOS', img: fotoSofaExtratora1 },
   { title: 'LIMPEZA DE\nESTOFADOS AUTOMOTIVOS', img: fotoCarro },
   { title: 'LIMPEZA DE\nCADEIRAS', img: fotoCadeira },
@@ -124,9 +48,8 @@ const WhatsAppIcon = ({ size = 20 }: { size?: number }) => (
   </svg>
 );
 
-function LandingPage() {
+export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const navigate = useNavigate();
 
   // FAQ Accordion State
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -160,7 +83,7 @@ function LandingPage() {
     setIsSubmitting(true);
     setSubmitError('');
     try {
-      await saveContactMessage({
+      await salvarMensagemContato({
         name: formData.name,
         phone: formData.whatsapp,
         neighborhood: formData.neighborhood,
@@ -176,7 +99,7 @@ function LandingPage() {
         `*Bairro:* ${formData.neighborhood}\n` +
         `*Mensagem:* ${formData.message}`
       );
-      window.open(`https://wa.me/5516920047362?text=${waText}`, '_blank');
+      window.open(`https://wa.me/5516920047362?text=${waText}`, '_blank', 'noopener,noreferrer');
       
       setFormData({ name: '', whatsapp: '', neighborhood: '', message: '' });
       setTimeout(() => setSubmitSuccess(false), 5000);
@@ -254,6 +177,8 @@ function LandingPage() {
         loop
         muted
         playsInline
+        poster={fundoPoster}
+        aria-hidden="true"
         className="fixed inset-0 w-full h-full object-cover -z-10 contrast-[1.15] saturate-[1.5] brightness-95"
       >
         <source src={fundoVideo} type="video/mp4" />
@@ -264,7 +189,7 @@ function LandingPage() {
       <nav className="fixed top-0 w-full z-50 bg-white/95 backdrop-blur-md border-b border-slate-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="F&E Clean Logo" className="h-12 w-auto object-contain" />
+            <img src={logo} alt="F&E Clean Logo" width={48} height={48} fetchPriority="high" className="h-12 w-auto object-contain" />
             <div className="flex flex-col">
               <span className="font-sans font-extrabold text-xl tracking-tight leading-none text-slate-900">
                 F<span className="text-brand-blue font-bold">&amp;</span>E Clean
@@ -380,7 +305,9 @@ function LandingPage() {
           <div className="relative rounded-[2rem] overflow-hidden shadow-2xl">
             <img 
               src={fotoCadeira} 
-              alt="Profissional da F&E Clean higienizando cadeiras de jantar" 
+              alt="Profissional da F&E Clean higienizando cadeiras de jantar"
+              loading="lazy"
+              decoding="async"
               className="w-full h-[400px] object-cover"
             />
           </div>
@@ -442,7 +369,9 @@ function LandingPage() {
           <div className="md:col-span-7 rounded-[2rem] overflow-hidden shadow-2xl relative z-0">
             <img 
               src={fotoSofaMetade} 
-              alt="Higienização de sofá com máquina extratora" 
+              alt="Higienização de sofá com máquina extratora"
+              loading="lazy"
+              decoding="async"
               className="w-full h-[400px] object-cover"
             />
           </div>
@@ -495,7 +424,7 @@ function LandingPage() {
                 whileHover={{ scale: 1.04 }}
                 className="relative aspect-square rounded-2xl overflow-hidden shadow-md group cursor-pointer border border-slate-100"
               >
-                <img src={img} alt={`Resultado ${i + 1}`} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" referrerPolicy="no-referrer" />
+                <img src={img} alt={`Resultado ${i + 1}`} loading="lazy" decoding="async" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                 <div className="absolute inset-0 bg-slate-900/10 opacity-0 group-hover:opacity-100 transition-opacity" />
               </motion.div>
             ))}
@@ -679,7 +608,7 @@ function LandingPage() {
               className="px-6 py-4 bg-brand-green hover:bg-brand-green-hover text-white rounded-full font-bold text-xs md:text-sm flex items-center gap-2 w-fit shadow-lg mb-10 transition-all hover:shadow-brand-green/30 active:scale-95"
             >
               <WhatsAppIcon size={16} />
-              Agende seu serviço conosco! (16) 92064-7362
+              Agende seu serviço conosco! (16) 92004-7362
             </a>
 
             <span className="text-xs uppercase tracking-[0.2em] font-bold text-white/70 mb-4">
@@ -713,6 +642,7 @@ function LandingPage() {
                 <input 
                   type="text" 
                   placeholder="Nome"
+                  maxLength={100}
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full bg-white text-slate-800 px-4 py-3 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all"
@@ -724,6 +654,7 @@ function LandingPage() {
                 <input 
                   type="text" 
                   placeholder="Whatsapp"
+                  maxLength={30}
                   value={formData.whatsapp}
                   onChange={(e) => setFormData({ ...formData, whatsapp: e.target.value })}
                   className="w-full bg-white text-slate-800 px-4 py-3 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all"
@@ -735,6 +666,7 @@ function LandingPage() {
                 <input 
                   type="text" 
                   placeholder="Bairro"
+                  maxLength={100}
                   value={formData.neighborhood}
                   onChange={(e) => setFormData({ ...formData, neighborhood: e.target.value })}
                   className="w-full bg-white text-slate-800 px-4 py-3 rounded-lg border border-slate-200 outline-none focus:ring-2 focus:ring-brand-green/20 focus:border-brand-green transition-all"
@@ -745,6 +677,7 @@ function LandingPage() {
               <div>
                 <textarea 
                   placeholder="Mensagem"
+                  maxLength={2000}
                   value={formData.message}
                   onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   rows={4}
@@ -784,7 +717,7 @@ function LandingPage() {
               {/* Logo & Nome */}
               <div className="flex items-center gap-3.5 mb-5">
                 <div className="w-12 h-12 rounded-xl bg-white p-1.5 flex items-center justify-center shadow-lg shadow-black/30 border border-white/20 flex-shrink-0">
-                  <img src={logo} alt="F&E Clean" className="w-full h-full object-contain" />
+                  <img src={logo} alt="F&E Clean" loading="lazy" decoding="async" className="w-full h-full object-contain" />
                 </div>
                 <div className="flex flex-col">
                   <span className="font-sans font-extrabold text-xl tracking-wider leading-none text-white">
@@ -1002,9 +935,9 @@ function ServiceCard({ service, delay }: { key?: React.Key; service: { title: st
       <div className="relative aspect-[4/3] rounded-2xl overflow-hidden border border-brand-blue/30 shadow-md group-hover:border-brand-blue group-hover:shadow-lg transition-all duration-300">
         <img
           src={service.img}
-          alt={service.title}
+          alt={service.title.replace('\n', ' ')}
+          decoding="async"
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-          referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-slate-900/10 to-transparent" />
         {/* Label overlay at bottom */}

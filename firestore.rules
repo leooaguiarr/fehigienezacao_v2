@@ -1,9 +1,99 @@
 rules_version = '2';
 
+// Regras de acesso do Firestore da F&E Clean.
+//
+// - Painel (/admin): só contas Google autorizadas leem e gravam os dados da
+//   empresa. Autorizadas = contas mestre (abaixo) + documentos ativos em
+//   autorizados/{email}. A lista de mestres também existe em public/js/store.js
+//   e as duas precisam ficar iguais.
+// - Público: o formulário de cadastro (cadastro.html) só pode CRIAR clientes e
+//   o formulário "Fale conosco" do site só pode CRIAR mensagens, ambos com os
+//   campos validados. Ninguém de fora lê nada.
+//
+// Publicar: firebase deploy --only firestore:rules
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+
+    function emailDoUsuario() {
+      return request.auth.token.email.lower();
     }
+
+    function logadoComGoogle() {
+      return request.auth != null
+        && request.auth.token.email is string
+        && request.auth.token.email_verified == true;
+    }
+
+    function ehMestre() {
+      return logadoComGoogle()
+        && emailDoUsuario() in ['feclean.higienizacao@gmail.com', 'leooaguiarr@gmail.com'];
+    }
+
+    function ehAutorizado() {
+      return ehMestre() || (
+        logadoComGoogle()
+        && exists(/databases/$(database)/documents/autorizados/$(emailDoUsuario()))
+        && get(/databases/$(database)/documents/autorizados/$(emailDoUsuario())).data.get('ativo', true) != false
+      );
+    }
+
+    // Campo de texto obrigatório com tamanho máximo.
+    function texto(dados, campo, maximo) {
+      return dados[campo] is string && dados[campo].size() > 0 && dados[campo].size() <= maximo;
+    }
+
+    // Campo de texto opcional com tamanho máximo.
+    function textoOpcional(dados, campo, maximo) {
+      return !(campo in dados) || (dados[campo] is string && dados[campo].size() <= maximo);
+    }
+
+    // Lista de contas com acesso ao painel.
+    match /autorizados/{email} {
+      // Cada pessoa consulta o próprio registro para saber se foi liberada.
+      allow get: if logadoComGoogle() && emailDoUsuario() == email;
+      allow read: if ehAutorizado();
+      allow write: if ehMestre();
+    }
+
+    // Dados da empresa: serviços, clientes, agendamentos, lançamentos e configurações.
+    match /usuarios/feclean-oficial/{colecao}/{documento} {
+      allow read, write: if ehAutorizado();
+    }
+
+    // Cadastro enviado pelo próprio cliente pelo link público.
+    match /usuarios/feclean-oficial/clientes/{cliente} {
+      allow create: if cadastroPublicoValido(request.resource.data);
+
+      function cadastroPublicoValido(d) {
+        return d.keys().hasOnly(['firstName', 'lastName', 'phone', 'documentType', 'document', 'cep',
+                                 'address', 'number', 'complement', 'neighborhood', 'city', 'createdAt'])
+          && texto(d, 'firstName', 60)
+          && texto(d, 'lastName', 80)
+          && texto(d, 'phone', 20)
+          && d.documentType in ['cpf', 'cnpj']
+          && textoOpcional(d, 'document', 20)
+          && textoOpcional(d, 'cep', 9)
+          && textoOpcional(d, 'address', 120)
+          && textoOpcional(d, 'number', 10)
+          && textoOpcional(d, 'complement', 80)
+          && textoOpcional(d, 'neighborhood', 80)
+          && textoOpcional(d, 'city', 80)
+          && d.createdAt == request.time;
+      }
+    }
+
+    // Mensagens do formulário "Fale conosco" da landing page.
+    match /contact_messages/{mensagem} {
+      allow create: if request.resource.data.keys().hasOnly(['name', 'phone', 'neighborhood', 'message', 'createdAt'])
+        && texto(request.resource.data, 'name', 100)
+        && texto(request.resource.data, 'phone', 30)
+        && texto(request.resource.data, 'neighborhood', 100)
+        && texto(request.resource.data, 'message', 2000)
+        && request.resource.data.createdAt == request.time;
+      allow read, delete: if ehAutorizado();
+    }
+
+    // Qualquer outro caminho fica fechado.
   }
 }

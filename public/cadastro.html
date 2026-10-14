@@ -2,16 +2,16 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Cadastro - F&E Clean</title>
   <meta name="theme-color" content="#237bb2">
   
-  <link rel="icon" href="/assets/logo-feclean.png" type="image/png" sizes="192x192">
+  <link rel="icon" href="/img/logo-feclean.webp" type="image/png" sizes="192x192">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <link rel="stylesheet" href="/css/app.css?v=30">
+  <link rel="stylesheet" href="/css/app.css?v=33">
   <style>
     body { background: #f4f7fa; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
     .public-form-container { width: 100%; max-width: 480px; background: #fff; border-radius: 24px; padding: 32px 24px; box-shadow: 0 10px 40px rgba(8,24,46,0.06); }
@@ -34,7 +34,7 @@
 
   <div class="public-form-container">
     <div class="brand-header" id="brandHeader">
-      <img src="/assets/logo-feclean.png" alt="F&E Clean">
+      <img src="/img/logo-feclean.webp" alt="F&E Clean">
       <h1>F&E Clean</h1>
       <p>Preencha seus dados para agilizarmos seu atendimento.</p>
     </div>
@@ -43,11 +43,11 @@
       <div class="form-grid">
         <label>
           Nome
-          <input type="text" id="clientFirstName" required placeholder="Primeiro nome">
+          <input type="text" id="clientFirstName" required maxlength="60" placeholder="Primeiro nome">
         </label>
         <label>
           Sobrenome
-          <input type="text" id="clientLastName" required placeholder="Sobrenome">
+          <input type="text" id="clientLastName" required maxlength="80" placeholder="Sobrenome">
         </label>
         <label class="span-2">
           WhatsApp
@@ -77,26 +77,26 @@
         </label>
         <label>
           Bairro
-          <input type="text" id="clientNeighborhood" required placeholder="Bairro">
+          <input type="text" id="clientNeighborhood" required maxlength="80" placeholder="Bairro">
         </label>
         
         <label class="span-2">
           Rua / Avenida
-          <input type="text" id="clientStreet" required placeholder="Nome da rua">
+          <input type="text" id="clientStreet" required maxlength="120" placeholder="Nome da rua">
         </label>
         
         <label>
           Número
-          <input type="text" id="clientNumber" inputmode="numeric" required placeholder="Ex: 123">
+          <input type="text" id="clientNumber" inputmode="numeric" required maxlength="10" placeholder="Ex: 123">
         </label>
         <label>
           Complemento
-          <input type="text" id="clientComplement" placeholder="Apto, Casa 2...">
+          <input type="text" id="clientComplement" maxlength="80" placeholder="Apto, Casa 2...">
         </label>
         
         <label class="span-2">
           Cidade
-          <input type="text" id="clientCity" required placeholder="Cidade" value="Ribeirão Preto">
+          <input type="text" id="clientCity" required maxlength="80" placeholder="Cidade" value="Ribeirão Preto">
         </label>
       </div>
 
@@ -119,6 +119,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <script type="module" src="/js/cadastro.js?v=4"></script>
+  <script type="module" src="/js/cadastro.js?v=5"></script>
 </body>
 </html>

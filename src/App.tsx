@@ -616,10 +616,11 @@ export default function App() {
             </span>
             
             <div className="flex gap-4">
-              <a 
-                href="https://wa.me/5516920047362" 
-                target="_blank" 
-                rel="noopener noreferrer" 
+              <a
+                href="https://instagram.com/feclean1"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram @feclean1"
                 className="bg-[#1877F2] text-white hover:bg-blue-600 w-12 h-12 rounded-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95 shadow-md"
               >
                 <Facebook size={22} fill="currentColor" className="stroke-none" />
